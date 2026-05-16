@@ -73,6 +73,7 @@ export default function Layout() {
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
               <span className="font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">SSD</span>
+              <span className="text-[10px] text-gray-500 block">Sistem Sekolah Digital</span>
             </div>
           )}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-gray-100">
@@ -139,6 +140,7 @@ export default function Layout() {
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <span className="font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">SSD</span>
+              <span className="text-[10px] text-gray-500 block">Sistem Sekolah Digital</span>
           </div>
           <button onClick={() => setMobileSidebarOpen(false)} className="p-2 rounded-lg hover:bg-gray-100">
             <X className="w-5 h-5" />
@@ -179,6 +181,7 @@ export default function Layout() {
             <Menu className="w-5 h-5" />
           </button>
           <span className="font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">SSD</span>
+              <span className="text-[10px] text-gray-500 block">Sistem Sekolah Digital</span>
           <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
             <span className="text-xs font-medium text-indigo-600">{user?.name?.charAt(0)}</span>
           </div>

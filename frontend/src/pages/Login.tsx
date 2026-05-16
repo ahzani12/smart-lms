@@ -34,7 +34,7 @@ export default function Login() {
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white">SSD</h1>
-          <p className="text-white/70 mt-2">Sistem Digital Sekolah</p>
+          <p className="text-indigo-200 text-sm">Sistem Sekolah Digital</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl p-8">
