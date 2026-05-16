@@ -1,8 +1,12 @@
 package handlers
 
 import (
+	"archive/zip"
+	"bytes"
 	"fmt"
 	"math"
+	"os"
+	"os/exec"
 	"strconv"
 	"time"
 
@@ -14,9 +18,13 @@ import (
 
 func GetRaports(c *fiber.Ctx) error {
 	var raports []models.Raport
-	q := config.DB.Where("school_id = ?", schoolID(c))
+	q := config.DB.Model(&models.Raport{})
+	sid := schoolID(c)
+	if sid > 0 {
+		q = q.Where("raports.school_id = ?", sid)
+	}
 	if semesterID := c.Query("semester_id"); semesterID != "" {
-		q = q.Where("semester_id = ?", semesterID)
+		q = q.Where("raports.semester_id = ?", semesterID)
 	}
 	if classID := c.Query("class_id"); classID != "" {
 		q = q.Joins("JOIN students ON students.id = raports.student_id").
@@ -310,4 +318,292 @@ func UpdateEvent(c *fiber.Ctx) error {
 func DeleteEvent(c *fiber.Ctx) error {
 	config.DB.Delete(&models.CalendarEvent{}, paramID(c))
 	return c.JSON(fiber.Map{"message": "Event dihapus"})
+}
+
+// ─── Download Raport Per Kelas (ZIP PDF) ──────────────────
+
+func DownloadRaportClass(c *fiber.Ctx) error {
+	classID, _ := strconv.ParseUint(c.Query("class_id"), 10, 64)
+	semesterID, _ := strconv.ParseUint(c.Query("semester_id"), 10, 64)
+	if classID == 0 || semesterID == 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "class_id dan semester_id wajib diisi"})
+	}
+
+	sid := schoolID(c)
+
+	// Get school info
+	var school models.School
+	if sid > 0 {
+		config.DB.First(&school, sid)
+	} else {
+		// superadmin: get school from class
+		var cls models.Class
+		config.DB.First(&cls, classID)
+		sid = cls.SchoolID
+		config.DB.First(&school, sid)
+	}
+
+	// Get semester
+	var semester models.Semester
+	config.DB.First(&semester, semesterID)
+
+	// Get class
+	var class models.Class
+	config.DB.First(&class, classID)
+
+	// Get all raports for this class + semester
+	var raports []models.Raport
+	rq := config.DB.Joins("JOIN students ON students.id = raports.student_id").
+		Where("students.class_id = ? AND raports.semester_id = ?", classID, semesterID)
+	if sid > 0 {
+		rq = rq.Where("raports.school_id = ?", sid)
+	}
+	rq.Preload("Student.User").Preload("Student.Class").Preload("Semester").
+		Preload("Items.Subject").Preload("Items.Teacher.User").
+		Find(&raports)
+
+	if len(raports) == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "Tidak ada raport untuk kelas ini"})
+	}
+
+	// Create temp dir
+	tmpDir := fmt.Sprintf("/tmp/raport_%d_%d_%d", sid, classID, time.Now().Unix())
+	os.MkdirAll(tmpDir, 0755)
+	defer os.RemoveAll(tmpDir)
+
+	// Logo path
+	logoPath := ""
+	if school.HeaderLogo != "" {
+		// Convert relative path to absolute
+		absLogo := "/root/smart-lms/backend" + school.HeaderLogo
+		if _, err := os.Stat(absLogo); err == nil {
+			logoPath = absLogo
+		}
+	}
+
+	var pdfFiles []string
+
+	for _, raport := range raports {
+		studentName := "siswa"
+		if raport.Student.User.Name != "" {
+			studentName = raport.Student.User.Name
+		}
+
+		// Build HTML
+		html := buildRaportHTML(raport, school, semester, logoPath)
+
+		// Write HTML to temp file
+		htmlFile := fmt.Sprintf("%s/%s.html", tmpDir, sanitizeFilename(studentName))
+		os.WriteFile(htmlFile, []byte(html), 0644)
+
+		// Convert to PDF
+		pdfFile := fmt.Sprintf("%s/%s.pdf", tmpDir, sanitizeFilename(studentName))
+		cmd := exec.Command("wkhtmltopdf",
+			"--page-size", "A4",
+			"--margin-top", "15mm",
+			"--margin-bottom", "15mm",
+			"--margin-left", "20mm",
+			"--margin-right", "20mm",
+			"--encoding", "UTF-8",
+			"--enable-local-file-access",
+			htmlFile, pdfFile)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			fmt.Printf("[RAPORT PDF ERROR] %s: %v\nOutput: %s\n", studentName, err, string(output))
+			continue // skip failed ones
+		}
+		pdfFiles = append(pdfFiles, pdfFile)
+	}
+
+	if len(pdfFiles) == 0 {
+		return c.Status(500).JSON(fiber.Map{"error": "Gagal generate PDF"})
+	}
+
+	// Create ZIP
+	var zipBuf bytes.Buffer
+	zipWriter := zip.NewWriter(&zipBuf)
+
+	for _, pdfFile := range pdfFiles {
+		data, err := os.ReadFile(pdfFile)
+		if err != nil {
+			continue
+		}
+		filename := pdfFile[len(tmpDir)+1:]
+		w, _ := zipWriter.Create(filename)
+		w.Write(data)
+	}
+	zipWriter.Close()
+
+	// Send ZIP
+	zipName := fmt.Sprintf("Raport_%s_%s.zip", sanitizeFilename(class.Name), semester.Name)
+	c.Set("Content-Type", "application/zip")
+	c.Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", zipName))
+	return c.Send(zipBuf.Bytes())
+}
+
+func sanitizeFilename(name string) string {
+	result := ""
+	for _, ch := range name {
+		if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '-' || ch == '_' || ch == ' ' {
+			result += string(ch)
+		}
+	}
+	return result
+}
+
+func buildRaportHTML(raport models.Raport, school models.School, semester models.Semester, logoPath string) string {
+	items := raport.Items
+	studentName := raport.Student.User.Name
+	className := ""
+	if raport.Student.Class.Name != "" {
+		className = raport.Student.Class.Name
+	}
+
+	// Calculate average
+	var totalScore float64
+	for _, item := range items {
+		totalScore += item.Score
+	}
+	avgScore := float64(0)
+	if len(items) > 0 {
+		avgScore = math.Round((totalScore/float64(len(items)))*10) / 10
+	}
+
+	// Logo img tag
+	logoTag := "LOGO"
+	if logoPath != "" {
+		logoTag = fmt.Sprintf(`<img src="file://%s" style="width:100%%;height:100%%;object-fit:contain;" />`, logoPath)
+	}
+
+	// Build items rows
+	itemsHTML := ""
+	for i, item := range items {
+		subjectName := ""
+		if item.Subject.Name != "" {
+			subjectName = item.Subject.Name
+		}
+		itemsHTML += fmt.Sprintf(`<tr><td class="no">%d</td><td>%s</td><td class="c">%.0f</td><td class="c">%s</td><td class="c">%s</td></tr>`,
+			i+1, subjectName, item.Score, item.Grade, item.KB)
+	}
+
+	// Rank handling
+	rank := 0
+	if raport.Rank != nil {
+		rank = *raport.Rank
+	}
+
+	// Attendance (simplified - just placeholders since we'd need extra queries)
+	html := fmt.Sprintf(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Raport %s</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Times New Roman', serif; padding: 30px 40px; font-size: 11pt; color: #000; }
+@page { size: A4; margin: 15mm 20mm; }
+.kop { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 12px; margin-bottom: 5px; }
+.kop-logo { width: 70px; height: 70px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8pt; color: #999; margin-right: 15px; flex-shrink: 0; }
+.kop-logo img { width: 100%%; height: 100%%; object-fit: contain; }
+.kop-text { text-align: center; flex: 1; }
+.kop-text .instansi { font-size: 10pt; letter-spacing: 1px; }
+.kop-text .sekolah { font-size: 16pt; font-weight: bold; letter-spacing: 2px; }
+.kop-text .alamat { font-size: 9pt; margin-top: 2px; }
+.kop-text .kontak { font-size: 9pt; }
+.kop-line2 { border-top: 1px solid #000; margin-top: 2px; }
+.judul { text-align: center; margin: 20px 0 15px; }
+.judul h2 { font-size: 14pt; text-decoration: underline; letter-spacing: 1px; }
+.judul p { font-size: 10pt; margin-top: 3px; }
+.data-siswa { margin-bottom: 15px; }
+.data-siswa table { width: 100%%; }
+.data-siswa td { padding: 2px 0; vertical-align: top; }
+.data-siswa .label { width: 130px; }
+.data-siswa .sep { width: 15px; }
+table.nilai { width: 100%%; border-collapse: collapse; margin-bottom: 15px; }
+table.nilai th, table.nilai td { border: 1px solid #000; padding: 5px 8px; }
+table.nilai th { background: #f5f5f5; font-weight: bold; text-align: center; font-size: 10pt; }
+table.nilai td.c { text-align: center; }
+table.nilai td.no { width: 35px; text-align: center; }
+table.nilai tfoot td { font-weight: bold; }
+.catatan { border: 1px solid #000; padding: 10px; min-height: 50px; margin-bottom: 20px; font-style: italic; }
+</style></head><body>
+
+<div class="kop">
+  <div class="kop-logo">%s</div>
+  <div class="kop-text">
+    <div class="instansi">%s</div>
+    <div class="sekolah">%s</div>
+    <div class="alamat">%s</div>
+    <div class="kontak">%s</div>
+  </div>
+</div>
+<div class="kop-line2"></div>
+
+<div class="judul">
+  <h2>LAPORAN HASIL BELAJAR</h2>
+  <p>Tahun Pelajaran %s — Semester %s</p>
+</div>
+
+<div class="data-siswa">
+  <table>
+    <tr><td class="label">Nama Peserta Didik</td><td class="sep">:</td><td><strong>%s</strong></td></tr>
+    <tr><td class="label">Kelas</td><td class="sep">:</td><td>%s</td></tr>
+    <tr><td class="label">NIS / NISN</td><td class="sep">:</td><td>%s / %s</td></tr>
+    <tr><td class="label">Peringkat</td><td class="sep">:</td><td><strong>%d</strong></td></tr>
+  </table>
+</div>
+
+<table class="nilai">
+  <thead><tr><th>No</th><th>Mata Pelajaran</th><th>Nilai</th><th>Grade</th><th>KB</th></tr></thead>
+  <tbody>%s</tbody>
+  <tfoot><tr><td colspan="2" style="text-align:center">Rata-rata</td><td class="c">%.1f</td><td colspan="2"></td></tr></tfoot>
+</table>
+
+<div class="catatan">%s</div>
+
+</body></html>`,
+		studentName,
+		logoTag,
+		school.HeaderText,
+		school.Name,
+		school.Address,
+		buildKontak(school),
+		semester.Year,
+		semesterPeriod(semester.Period),
+		studentName,
+		className,
+		raport.Student.NIS,
+		raport.Student.NISN,
+		rank,
+		itemsHTML,
+		avgScore,
+		raportNotes(raport.Notes),
+	)
+
+	return html
+}
+
+func buildKontak(school models.School) string {
+	kontak := ""
+	if school.Phone != "" {
+		kontak += "Telp. " + school.Phone
+	}
+	if school.Email != "" {
+		if kontak != "" {
+			kontak += " | "
+		}
+		kontak += "Email: " + school.Email
+	}
+	return kontak
+}
+
+func semesterPeriod(period string) string {
+	if period == "ganjil" {
+		return "Ganjil (I)"
+	}
+	return "Genap (II)"
+}
+
+func raportNotes(notes string) string {
+	if notes == "" {
+		return "Terus tingkatkan prestasi belajar."
+	}
+	return notes
 }

@@ -41,6 +41,29 @@ export default function Raport() {
     }
   }
 
+  const downloadAllRaport = async () => {
+    if (!classFilter || !semesterFilter) return
+    try {
+      toast.loading('Generating PDF...', { id: 'download-raport' })
+      const res = await axios.get('/api/raport/download-class', {
+        params: { class_id: classFilter, semester_id: semesterFilter },
+        responseType: 'blob'
+      })
+      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const link = document.createElement('a')
+      link.href = url
+      const filename = res.headers['content-disposition']?.match(/filename="(.+)"/)?.[1] || 'raport.zip'
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+      toast.success('Download berhasil!', { id: 'download-raport' })
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Gagal download raport', { id: 'download-raport' })
+    }
+  }
+
   const printRaport = () => {
     const printWindow = window.open('', '_blank')
     if (!printWindow || !detail) return
@@ -108,7 +131,7 @@ export default function Raport() {
       <!-- KOP SEKOLAH -->
       <div class="kop">
         <div class="kop-logo">
-          ${school?.header_logo ? `<img src="${school.header_logo}" />` : 'LOGO'}
+          ${school?.header_logo ? `<img src="${window.location.origin}${school.header_logo}" />` : 'LOGO'}
         </div>
         <div class="kop-text">
           <div class="instansi">${school?.header_text?.replace(/\\n/g, '<br>') || 'PEMERINTAH DAERAH<br>DINAS PENDIDIKAN'}</div>
@@ -233,7 +256,7 @@ export default function Raport() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 items-center">
         <select value={semesterFilter} onChange={e => setSemesterFilter(Number(e.target.value))}
           className="px-3 py-2 rounded-xl border text-sm">
           <option value={0}>Semua Semester</option>
@@ -244,6 +267,12 @@ export default function Raport() {
           <option value={0}>Semua Kelas</option>
           {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
+        {classFilter > 0 && semesterFilter > 0 && (
+          <button onClick={downloadAllRaport}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm hover:bg-green-700 transition">
+            <Download className="w-4 h-4" /> Download Semua PDF
+          </button>
+        )}
       </div>
 
       {/* Table */}

@@ -155,13 +155,15 @@ export default function SchoolSettings() {
               <select value={form.level} onChange={e => setForm({ ...form, level: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none">
                 <option value="">Pilih...</option>
+                <option value="TK">TK</option>
+                <option value="RA">RA</option>
                 <option value="SD">SD</option>
+                <option value="MI">MI</option>
                 <option value="SMP">SMP</option>
+                <option value="MTs">MTs</option>
                 <option value="SMA">SMA</option>
                 <option value="SMK">SMK</option>
                 <option value="MA">MA</option>
-                <option value="MTs">MTs</option>
-                <option value="MI">MI</option>
               </select>
             </div>
           </div>

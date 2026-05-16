@@ -48,7 +48,32 @@ func SuperCreateSchool(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 	config.DB.Create(&school)
-	return c.Status(201).JSON(fiber.Map{"message": "Sekolah berhasil dibuat", "id": school.ID})
+
+	// Auto-generate kelas sesuai jenjang
+	classNames := getClassNamesByLevel(school.Level)
+	for _, name := range classNames {
+		config.DB.Create(&models.Class{
+			Name:     name,
+			SchoolID: school.ID,
+		})
+	}
+
+	return c.Status(201).JSON(fiber.Map{"message": "Sekolah berhasil dibuat", "id": school.ID, "classes_created": len(classNames)})
+}
+
+func getClassNamesByLevel(level string) []string {
+	switch level {
+	case "TK", "RA":
+		return []string{"TK A", "TK B"}
+	case "SD", "MI":
+		return []string{"Kelas 1", "Kelas 2", "Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"}
+	case "SMP", "MTs":
+		return []string{"Kelas 7", "Kelas 8", "Kelas 9"}
+	case "SMA", "SMK", "MA":
+		return []string{"Kelas 10", "Kelas 11", "Kelas 12"}
+	default:
+		return []string{}
+	}
 }
 
 func SuperUpdateSchool(c *fiber.Ctx) error {

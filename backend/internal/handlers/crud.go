@@ -130,12 +130,34 @@ func GetTeacher(c *fiber.Ctx) error {
 	return c.JSON(teacher)
 }
 
+func generateTeacherCode() string {
+	chars := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	code := "GR"
+	for i := 0; i < 4; i++ {
+		code += string(chars[rand.Intn(len(chars))])
+	}
+	return code
+}
+
+func uniqueTeacherCode() string {
+	for i := 0; i < 10; i++ {
+		code := generateTeacherCode()
+		var count int64
+		config.DB.Model(&models.Teacher{}).Where("nip = ?", code).Count(&count)
+		if count == 0 {
+			return code
+		}
+	}
+	return generateTeacherCode() + "X"
+}
+
 func CreateTeacher(c *fiber.Ctx) error {
 	var req struct {
 		Name     string `json:"name"`
 		Email    string `json:"email"`
 		NIP      string `json:"nip"`
 		Phone    string `json:"phone"`
+		Password string `json:"password"`
 		Subjects []uint `json:"subjects"`
 	}
 	if err := c.BodyParser(&req); err != nil {
@@ -143,15 +165,31 @@ func CreateTeacher(c *fiber.Ctx) error {
 	}
 
 	sid := schoolID(c)
-	hash, _ := bcrypt.GenerateFromPassword([]byte("guru123"), bcrypt.DefaultCost)
+	pass := req.Password
+	if pass == "" {
+		pass = "guru123"
+	}
+	hash, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	user := models.User{
 		Name: req.Name, Email: req.Email, Password: string(hash),
 		Role: "guru", Phone: req.Phone, Active: true, SchoolID: &sid,
 	}
-	config.DB.Create(&user)
+	if err := config.DB.Create(&user).Error; err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Email sudah terdaftar"})
+	}
 
-	teacher := models.Teacher{UserID: user.ID, NIP: req.NIP, SchoolID: sid}
-	config.DB.Create(&teacher)
+	// Kalau NIP kosong (guru honorer), generate kode unik
+	nip := req.NIP
+	if nip == "" {
+		nip = uniqueTeacherCode()
+	}
+
+	teacher := models.Teacher{UserID: user.ID, NIP: nip, SchoolID: sid}
+	if err := config.DB.Create(&teacher).Error; err != nil {
+		// Rollback user
+		config.DB.Unscoped().Delete(&user)
+		return c.Status(400).JSON(fiber.Map{"error": "NIP/Kode sudah terdaftar"})
+	}
 
 	if len(req.Subjects) > 0 {
 		var subjects []models.Subject
@@ -161,7 +199,7 @@ func CreateTeacher(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.Status(201).JSON(fiber.Map{"message": "Teacher created", "id": teacher.ID})
+	return c.Status(201).JSON(fiber.Map{"message": "Teacher created", "id": teacher.ID, "nip": nip})
 }
 
 func UpdateTeacher(c *fiber.Ctx) error {

@@ -92,7 +92,7 @@ type Teacher struct {
 	DeletedAt  gorm.DeletedAt `json:"-" gorm:"index"`
 	UserID     uint           `json:"user_id" gorm:"uniqueIndex"`
 	User       User           `json:"user,omitempty" gorm:"foreignKey:UserID"`
-	NIP        string         `json:"nip" gorm:"size:30;uniqueIndex"`
+	NIP        string         `json:"nip" gorm:"column:nip;size:30;uniqueIndex"`
 	SchoolID   uint           `json:"school_id" gorm:"index"`
 	Subjects   []Subject      `json:"subjects,omitempty" gorm:"many2many:teacher_subjects;"`
 }

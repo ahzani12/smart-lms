@@ -133,10 +133,15 @@ export default function SuperSchools() {
               <div className="grid grid-cols-2 gap-3">
                 <input value={form.npsn} onChange={e => setForm({...form, npsn: e.target.value})} placeholder="NPSN" className="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
                 <select value={form.level} onChange={e => setForm({...form, level: e.target.value})} className="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <option value="TK">TK</option>
+                  <option value="RA">RA</option>
                   <option value="SD">SD</option>
+                  <option value="MI">MI</option>
                   <option value="SMP">SMP</option>
+                  <option value="MTs">MTs</option>
                   <option value="SMA">SMA</option>
                   <option value="SMK">SMK</option>
+                  <option value="MA">MA</option>
                 </select>
               </div>
             </div>

@@ -158,6 +158,7 @@ func Setup(app *fiber.App) {
 	// ─── Raport ────────────────────────────────────────
 	raport := api.Group("/raport", middleware.AuthRequired)
 	raport.Get("/", handlers.GetRaports)
+	raport.Get("/download-class", middleware.RoleRequired("superadmin", "admin_pusat", "admin_cabang", "guru"), handlers.DownloadRaportClass)
 	raport.Get("/:id", handlers.GetRaport)
 	raport.Post("/", middleware.RoleRequired("guru", "admin_pusat"), handlers.CreateRaport)
 	raport.Put("/:id", middleware.RoleRequired("guru", "admin_pusat"), handlers.UpdateRaport)

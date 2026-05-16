@@ -4,11 +4,33 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { Users, X, Plus, Trash2, Loader2, Search } from 'lucide-react'
 
+function getLevelOptions(schoolLevel: string): { label: string; value: string }[] {
+  switch (schoolLevel) {
+    case 'TK': case 'RA':
+      return [{ label: 'TK A', value: 'TK A' }, { label: 'TK B', value: 'TK B' }]
+    case 'SD': case 'MI':
+      return [
+        { label: '1', value: '1' }, { label: '2', value: '2' }, { label: '3', value: '3' },
+        { label: '4', value: '4' }, { label: '5', value: '5' }, { label: '6', value: '6' },
+      ]
+    case 'SMP': case 'MTs':
+      return [{ label: '7', value: '7' }, { label: '8', value: '8' }, { label: '9', value: '9' }]
+    case 'SMA': case 'SMK': case 'MA':
+      return [{ label: '10', value: '10' }, { label: '11', value: '11' }, { label: '12', value: '12' }]
+    default:
+      return [{ label: '10', value: '10' }, { label: '11', value: '11' }, { label: '12', value: '12' }]
+  }
+}
+
 export default function Classes() {
   const [teachers, setTeachers] = useState<any[]>([])
   const [manageClass, setManageClass] = useState<any>(null)
+  const [schoolLevel, setSchoolLevel] = useState('')
 
-  useEffect(() => { axios.get('/api/teachers/').then(r => setTeachers(r.data || [])) }, [])
+  useEffect(() => {
+    axios.get('/api/teachers/').then(r => setTeachers(r.data || []))
+    axios.get('/api/school').then(r => setSchoolLevel(r.data?.level || ''))
+  }, [])
 
   return (
     <>
@@ -30,7 +52,7 @@ export default function Classes() {
         ]}
         formFields={[
           { key: 'name', label: 'Nama Kelas' },
-          { key: 'level', label: 'Tingkat', type: 'select', options: [{ label: 'X', value: 'X' }, { label: 'XI', value: 'XI' }, { label: 'XII', value: 'XII' }] },
+          { key: 'level', label: 'Tingkat', type: 'select', options: getLevelOptions(schoolLevel) },
           { key: 'major', label: 'Jurusan', type: 'select', options: [{ label: 'IPA', value: 'IPA' }, { label: 'IPS', value: 'IPS' }, { label: 'BAHASA', value: 'BAHASA' }] },
           { key: 'capacity', label: 'Kapasitas', type: 'number' },
           { key: 'teacher_id', label: 'Wali Kelas', type: 'select', options: teachers.map(t => ({ label: `${t.user?.name || '-'} (${t.nip})`, value: t.id })) },
