@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+frontend/dist/
+frontend/node_modules/
+backend/smart-lms
+
+# Environment
+.env
+*.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp
+/tmp/
+*.tmp
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
