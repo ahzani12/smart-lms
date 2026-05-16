@@ -320,6 +320,67 @@ func DeleteEvent(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Event dihapus"})
 }
 
+// ─── Holiday Check Helper ─────────────────────────────────
+
+// IsHoliday checks if a given date falls within a "libur" calendar event for the school
+func IsHoliday(schoolID uint, date time.Time) (bool, string) {
+	dateOnly := date.Truncate(24 * time.Hour)
+	var event models.CalendarEvent
+	err := config.DB.Where("school_id = ? AND type = ? AND start_date <= ? AND end_date >= ?",
+		schoolID, "libur", dateOnly, dateOnly).First(&event).Error
+	if err != nil {
+		return false, ""
+	}
+	return true, event.Title
+}
+
+// CheckHoliday — endpoint to check if a date is holiday
+func CheckHoliday(c *fiber.Ctx) error {
+	dateStr := c.Query("date")
+	if dateStr == "" {
+		dateStr = time.Now().Format("2006-01-02")
+	}
+	date, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Format tanggal salah (YYYY-MM-DD)"})
+	}
+	isHoliday, title := IsHoliday(schoolID(c), date)
+	return c.JSON(fiber.Map{"date": dateStr, "is_holiday": isHoliday, "title": title})
+}
+
+// GetHolidaysInRange — get all holidays in a date range
+func GetHolidaysInRange(c *fiber.Ctx) error {
+	from := c.Query("from")
+	to := c.Query("to")
+	if from == "" || to == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "from dan to wajib (YYYY-MM-DD)"})
+	}
+	var events []models.CalendarEvent
+	config.DB.Where("school_id = ? AND type = ? AND start_date <= ? AND end_date >= ?",
+		schoolID(c), "libur", to, from).
+		Order("start_date ASC").Find(&events)
+
+	// Expand to individual dates
+	type HolidayDate struct {
+		Date  string `json:"date"`
+		Title string `json:"title"`
+	}
+	fromDate, _ := time.Parse("2006-01-02", from)
+	toDate, _ := time.Parse("2006-01-02", to)
+	var holidays []HolidayDate
+	for d := fromDate; !d.After(toDate); d = d.AddDate(0, 0, 1) {
+		for _, ev := range events {
+			evStart := ev.StartDate.Truncate(24 * time.Hour)
+			evEnd := ev.EndDate.Truncate(24 * time.Hour)
+			if !d.Before(evStart) && !d.After(evEnd) {
+				holidays = append(holidays, HolidayDate{Date: d.Format("2006-01-02"), Title: ev.Title})
+				break
+			}
+		}
+	}
+	return c.JSON(holidays)
+}
+
 // ─── Download Raport Per Kelas (ZIP PDF) ──────────────────
 
 func DownloadRaportClass(c *fiber.Ctx) error {

@@ -265,14 +265,30 @@ type AIConfig struct {
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index"`
-	Name         string         `json:"name" gorm:"size:100;not null"`          // "OpenAI", "ChatGPT Free", etc
-	AuthType     string         `json:"auth_type" gorm:"size:20;default:apikey"` // apikey | chatgpt_session
+	Name         string         `json:"name" gorm:"size:100;not null"`          // "OpenAI", "Gemini", "xAI"
+	AuthType     string         `json:"auth_type" gorm:"size:20;default:apikey"` // apikey | oauth
 	BaseURL      string         `json:"base_url" gorm:"size:500"`
 	APIKey       string         `json:"api_key" gorm:"size:500"`
-	SessionToken string         `json:"session_token,omitempty" gorm:"size:5000"` // ChatGPT session access_token
+	SessionToken string         `json:"session_token,omitempty" gorm:"size:5000"`
 	Model        string         `json:"model" gorm:"size:100;not null"`
 	Active       bool           `json:"active" gorm:"default:false"`
-	SchoolID     uint           `json:"school_id" gorm:"index"`
+	IsGlobal     bool           `json:"is_global" gorm:"default:false;index"` // true = set by superadmin, available to all schools
+	SchoolID     uint           `json:"school_id" gorm:"index"`               // 0 = global
+	School       *School        `json:"school,omitempty" gorm:"foreignKey:SchoolID"`
+}
+
+// ─── AI Quota (per school monthly limit) ──────────────────
+
+type AIQuota struct {
+	ID           uint           `json:"id" gorm:"primaryKey"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index"`
+	SchoolID     uint           `json:"school_id" gorm:"uniqueIndex"`
+	School       *School        `json:"school,omitempty" gorm:"foreignKey:SchoolID"`
+	MonthlyLimit int            `json:"monthly_limit" gorm:"default:100"`  // max requests per month
+	UsedThisMonth int           `json:"used_this_month" gorm:"default:0"`
+	ResetAt      time.Time      `json:"reset_at"`                          // next reset date
 }
 
 // ─── AI Job (async background task) ───────────────────────
@@ -408,6 +424,7 @@ func AutoMigrate(db *gorm.DB) {
 		&Raport{},
 		&RaportItem{},
 		&AIConfig{},
+		&AIQuota{},
 		&AIJob{},
 		&CalendarEvent{},
 		&Parent{},

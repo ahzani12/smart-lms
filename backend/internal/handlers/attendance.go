@@ -138,6 +138,12 @@ func OpenAttendanceSession(c *fiber.Ctx) error {
 		date = time.Now().Truncate(24 * time.Hour)
 	}
 
+	// Cek hari libur
+	sid := schoolID(c)
+	if isHoliday, title := IsHoliday(sid, date); isHoliday {
+		return c.Status(400).JSON(fiber.Map{"error": "Tidak bisa buka absensi — hari libur: " + title, "is_holiday": true, "holiday_title": title})
+	}
+
 	// Validasi: guru yang login harus pemilik jadwal
 	userID := c.Locals("user_id").(uint)
 	var teacher models.Teacher
@@ -497,6 +503,11 @@ func GetTeacherAttendanceSummary(c *fiber.Ctx) error {
 			dow := int(d.Weekday())
 			if dow == 0 {
 				dow = 7
+			}
+
+			// Skip hari libur
+			if isHol, _ := IsHoliday(sid, d); isHol {
+				continue
 			}
 
 			hasSchedule := false

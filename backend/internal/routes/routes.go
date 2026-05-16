@@ -176,6 +176,10 @@ func Setup(app *fiber.App) {
 	calendar.Post("/events", middleware.RoleRequired("admin_pusat", "admin_cabang", "guru"), handlers.CreateEvent)
 	calendar.Put("/events/:id", middleware.RoleRequired("admin_pusat", "admin_cabang", "guru"), handlers.UpdateEvent)
 	calendar.Delete("/events/:id", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.DeleteEvent)
+	calendar.Get("/check-holiday", handlers.CheckHoliday)
+	calendar.Get("/holidays", handlers.GetHolidaysInRange)
+	calendar.Get("/libur-nasional", handlers.GetLiburNasional)
+	calendar.Post("/sync-libur-nasional", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.SyncLiburNasional)
 
 	// ─── AI ────────────────────────────────────────────
 	ai := api.Group("/ai", middleware.AuthRequired)
@@ -185,6 +189,13 @@ func Setup(app *fiber.App) {
 	ai.Delete("/configs/:id", middleware.RoleRequired("admin_pusat"), handlers.DeleteAIConfig)
 	ai.Post("/configs/:id/activate", middleware.RoleRequired("admin_pusat"), handlers.SetActiveAI)
 	ai.Post("/fetch-models", middleware.RoleRequired("admin_pusat"), handlers.FetchAIModels)
+	// School AI config (hybrid)
+	ai.Get("/school-config", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.GetSchoolAIConfig)
+	ai.Post("/school-config", middleware.RoleRequired("admin_pusat"), handlers.SaveSchoolAIConfig)
+	ai.Delete("/school-config/:id", middleware.RoleRequired("admin_pusat"), handlers.DeleteSchoolAIConfig)
+	// Resolve (used by AI Hub to get active config)
+	ai.Get("/resolve", handlers.ResolveAIConfig)
+	ai.Post("/usage", handlers.IncrementAIUsage)
 
 	// OAuth ChatGPT — start requires auth, callback is public (redirect from OpenAI)
 	ai.Post("/oauth/chatgpt/start", middleware.RoleRequired("admin_pusat"), handlers.OAuthChatGPTStart)
@@ -247,4 +258,13 @@ func Setup(app *fiber.App) {
 	super.Put("/admins/:id", handlers.SuperUpdateAdmin)
 	super.Delete("/admins/:id", handlers.SuperDeleteAdmin)
 	super.Post("/admins/:id/reset-password", handlers.SuperResetPassword)
+	// AI Config (global)
+	super.Get("/ai-configs", handlers.SuperGetAIConfigs)
+	super.Post("/ai-configs", handlers.SuperCreateAIConfig)
+	super.Put("/ai-configs/:id", handlers.SuperUpdateAIConfig)
+	super.Delete("/ai-configs/:id", handlers.SuperDeleteAIConfig)
+	// AI Quota
+	super.Get("/ai-quotas", handlers.SuperGetAIQuotas)
+	super.Post("/ai-quotas", handlers.SuperSetAIQuota)
+	super.Post("/ai-quotas/:id/reset", handlers.SuperResetQuota)
 }

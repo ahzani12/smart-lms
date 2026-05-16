@@ -57,18 +57,23 @@ export default function Attendance() {
   const [activeSession, setActiveSession] = useState<AttendanceSession | null>(null)
   const [loading, setLoading] = useState(false)
   const [isTeacher, setIsTeacher] = useState(true)
+  const [holiday, setHoliday] = useState<{ is_holiday: boolean; title: string } | null>(null)
 
   useEffect(() => { if (view === 'today') fetchToday() }, [view])
 
   const fetchToday = async () => {
     setLoading(true)
     try {
+      // Check holiday first
+      const today = new Date().toISOString().slice(0, 10)
+      const hol = await axios.get('/api/calendar/check-holiday', { params: { date: today } })
+      setHoliday(hol.data)
+
       const r = await axios.get('/api/schedules/today')
       setSchedules(r.data || [])
       setIsTeacher(true)
     } catch (err: any) {
       if (err?.response?.status === 404) {
-        // Non-teacher (admin) — no personal schedule, show today's sessions across school instead
         setIsTeacher(false)
         try {
           const today = new Date().toISOString().slice(0, 10)
@@ -149,6 +154,13 @@ export default function Attendance() {
       {view === 'today' && (
         loading ? (
           <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
+        ) : holiday?.is_holiday ? (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
+            <div className="text-4xl mb-2">🏖️</div>
+            <div className="text-lg font-bold text-green-800">Hari Libur</div>
+            <div className="text-green-600 mt-1">{holiday.title}</div>
+            <div className="text-sm text-green-500 mt-2">Absensi tidak aktif hari ini</div>
+          </div>
         ) : isTeacher ? (
           schedules.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">

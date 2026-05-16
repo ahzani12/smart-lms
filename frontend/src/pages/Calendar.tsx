@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { ChevronLeft, ChevronRight, Plus, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Loader2, Download } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
@@ -49,9 +49,21 @@ export default function Calendar() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Kalender Akademik</h1>
-        <button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">
-          <Plus className="w-4 h-4" /> Tambah Event
-        </button>
+        <div className="flex gap-2">
+          <button onClick={async () => {
+            try {
+              const r = await axios.post('/api/calendar/sync-libur-nasional?year=2026')
+              toast.success(`Sync selesai: ${r.data.added} ditambah, ${r.data.skipped} sudah ada`)
+              const res = await axios.get(`/api/calendar/events?month=${monthStr}`)
+              setEvents(res.data)
+            } catch { toast.error('Gagal sync libur nasional') }
+          }} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm">
+            <Download className="w-4 h-4" /> Sync Libur Nasional
+          </button>
+          <button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 text-sm">
+            <Plus className="w-4 h-4" /> Tambah Event
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6">

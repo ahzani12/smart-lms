@@ -16,6 +16,9 @@ import (
 )
 
 func main() {
+	// Set timezone to WIB
+	os.Setenv("TZ", "Asia/Jakarta")
+
 	// Load config
 	config.Load()
 

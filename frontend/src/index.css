@@ -38,3 +38,21 @@ body {
 .gradient-success {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
+
+/* PWA safe area for notch/home indicator */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Mobile optimizations */
+@media (max-width: 1023px) {
+  /* Prevent text overflow */
+  table { display: block; overflow-x: auto; }
+  
+  /* Better touch targets */
+  button, a { min-height: 44px; }
+  
+  /* Fix modals on mobile */
+  .fixed { -webkit-overflow-scrolling: touch; }
+}
+

@@ -30,6 +30,7 @@ import SchoolSettings from './pages/SchoolSettings'
 import SuperDashboard from './pages/super/SuperDashboard'
 import SuperSchools from './pages/super/SuperSchools'
 import SuperAdmins from './pages/super/SuperAdmins'
+import SuperAIConfig from './pages/super/SuperAIConfig'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -79,6 +80,7 @@ export default function App() {
             <Route path="super" element={<SuperDashboard />} />
             <Route path="super/schools" element={<SuperSchools />} />
             <Route path="super/admins" element={<SuperAdmins />} />
+            <Route path="super/ai-config" element={<SuperAIConfig />} />
           </Route>
         </Routes>
       </BrowserRouter>
