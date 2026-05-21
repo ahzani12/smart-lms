@@ -248,11 +248,11 @@ export default function Raport() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <FileText className="w-6 h-6 text-indigo-600" />
+        <h1 className="text-2xl font-bold text-navy flex items-center gap-2">
+          <FileText className="w-6 h-6 text-amber-warm" />
           Raport Siswa
         </h1>
-        <p className="text-gray-500">Lihat dan cetak raport hasil belajar</p>
+        <p className="text-navy/60">Lihat dan cetak raport hasil belajar</p>
       </div>
 
       {/* Filters */}
@@ -277,40 +277,40 @@ export default function Raport() {
 
       {/* Table */}
       {loading ? (
-        <div className="flex justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full"></div></div>
+        <div className="flex justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-warm border-t-indigo-600 rounded-full"></div></div>
       ) : (
         <div className="bg-white rounded-2xl border overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-cream-soft border-b">
               <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Siswa</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">NIS</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Kelas</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Semester</th>
-                <th className="text-center px-4 py-3 font-medium text-gray-600">Peringkat</th>
-                <th className="text-center px-4 py-3 font-medium text-gray-600">Aksi</th>
+                <th className="text-left px-4 py-3 font-medium text-navy/70">Siswa</th>
+                <th className="text-left px-4 py-3 font-medium text-navy/70">NIS</th>
+                <th className="text-left px-4 py-3 font-medium text-navy/70">Kelas</th>
+                <th className="text-left px-4 py-3 font-medium text-navy/70">Semester</th>
+                <th className="text-center px-4 py-3 font-medium text-navy/70">Peringkat</th>
+                <th className="text-center px-4 py-3 font-medium text-navy/70">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {raports.map((r: any) => (
-                <tr key={r.id} className="hover:bg-gray-50">
+                <tr key={r.id} className="hover:bg-cream-soft">
                   <td className="px-4 py-3 font-medium">{r.student?.user?.name || '-'}</td>
-                  <td className="px-4 py-3 text-gray-600">{r.student?.nis || '-'}</td>
-                  <td className="px-4 py-3 text-gray-600">{r.student?.class?.name || '-'}</td>
-                  <td className="px-4 py-3 text-gray-600">{r.semester?.name || '-'}</td>
+                  <td className="px-4 py-3 text-navy/70">{r.student?.nis || '-'}</td>
+                  <td className="px-4 py-3 text-navy/70">{r.student?.class?.name || '-'}</td>
+                  <td className="px-4 py-3 text-navy/70">{r.semester?.name || '-'}</td>
                   <td className="px-4 py-3 text-center">
-                    {r.rank ? <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">#{r.rank}</span> : '-'}
+                    {r.rank ? <span className="px-2 py-0.5 bg-amber-warm/15 text-amber-warm rounded-full text-xs font-bold">#{r.rank}</span> : '-'}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <button onClick={() => viewDetail(r.id)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100">
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-amber-soft/40 text-amber-warm rounded-lg hover:bg-amber-soft">
                       <Eye className="w-3.5 h-3.5" /> Lihat
                     </button>
                   </td>
                 </tr>
               ))}
               {raports.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Belum ada raport. Generate dulu di menu Generate Raport.</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-navy/40">Belum ada raport. Generate dulu di menu Generate Raport.</td></tr>
               )}
             </tbody>
           </table>
@@ -328,7 +328,7 @@ export default function Raport() {
                   className="flex items-center gap-1 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
                   <Download className="w-4 h-4" /> Cetak
                 </button>
-                <button onClick={() => setShowDetail(false)} className="p-1.5 hover:bg-gray-100 rounded-lg">
+                <button onClick={() => setShowDetail(false)} className="p-1.5 hover:bg-amber-soft/40 rounded-lg">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -337,18 +337,18 @@ export default function Raport() {
             <div className="p-6 space-y-6">
               {/* Student Info */}
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><span className="text-gray-500">Nama:</span> <span className="font-medium">{detail.raport?.student?.user?.name}</span></div>
-                <div><span className="text-gray-500">Kelas:</span> <span className="font-medium">{detail.raport?.student?.class?.name}</span></div>
-                <div><span className="text-gray-500">NIS:</span> <span className="font-medium">{detail.raport?.student?.nis}</span></div>
-                <div><span className="text-gray-500">Semester:</span> <span className="font-medium">{detail.raport?.semester?.name}</span></div>
-                <div><span className="text-gray-500">Peringkat:</span> <span className="font-bold text-indigo-600">#{detail.raport?.rank || '-'}</span></div>
+                <div><span className="text-navy/60">Nama:</span> <span className="font-medium">{detail.raport?.student?.user?.name}</span></div>
+                <div><span className="text-navy/60">Kelas:</span> <span className="font-medium">{detail.raport?.student?.class?.name}</span></div>
+                <div><span className="text-navy/60">NIS:</span> <span className="font-medium">{detail.raport?.student?.nis}</span></div>
+                <div><span className="text-navy/60">Semester:</span> <span className="font-medium">{detail.raport?.semester?.name}</span></div>
+                <div><span className="text-navy/60">Peringkat:</span> <span className="font-bold text-amber-warm">#{detail.raport?.rank || '-'}</span></div>
               </div>
 
               {/* Scores Table */}
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Nilai Per Mata Pelajaran</h3>
+                <h3 className="font-semibold text-navy mb-3">Nilai Per Mata Pelajaran</h3>
                 <table className="w-full text-sm border">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-cream-soft">
                     <tr>
                       <th className="px-4 py-2 text-left border">No</th>
                       <th className="px-4 py-2 text-left border">Mata Pelajaran</th>
@@ -359,23 +359,23 @@ export default function Raport() {
                   </thead>
                   <tbody>
                     {(detail.raport?.items || []).map((item: any, i: number) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
+                      <tr key={item.id} className="hover:bg-cream-soft">
                         <td className="px-4 py-2 border text-center">{i + 1}</td>
                         <td className="px-4 py-2 border">{item.subject?.name || '-'}</td>
                         <td className="px-4 py-2 border text-center font-semibold">{item.score}</td>
                         <td className="px-4 py-2 border text-center">
                           <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                            item.grade === 'A' ? 'bg-green-100 text-green-700' :
-                            item.grade === 'B' ? 'bg-blue-100 text-blue-700' :
-                            item.grade === 'C' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-red-100 text-red-700'
+                            item.grade === 'A' ? 'bg-mint/15 text-mint' :
+                            item.grade === 'B' ? 'bg-sky-warm/15 text-sky-warm' :
+                            item.grade === 'C' ? 'bg-amber-warm/15 text-amber-warm' :
+                            'bg-rose/15 text-rose'
                           }`}>{item.grade}</span>
                         </td>
                         <td className="px-4 py-2 border">{item.teacher?.user?.name || '-'}</td>
                       </tr>
                     ))}
                     {(!detail.raport?.items || detail.raport.items.length === 0) && (
-                      <tr><td colSpan={5} className="px-4 py-4 text-center text-gray-400 border">Belum ada data nilai</td></tr>
+                      <tr><td colSpan={5} className="px-4 py-4 text-center text-navy/40 border">Belum ada data nilai</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -383,7 +383,7 @@ export default function Raport() {
 
               {/* Attendance */}
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Kehadiran</h3>
+                <h3 className="font-semibold text-navy mb-3">Kehadiran</h3>
                 <div className="grid grid-cols-5 gap-3">
                   {[
                     { label: 'Hadir', value: detail.attendance?.hadir, color: 'green' },
@@ -394,7 +394,7 @@ export default function Raport() {
                   ].map(a => (
                     <div key={a.label} className={`text-center p-3 rounded-xl bg-${a.color}-50`}>
                       <div className={`text-2xl font-bold text-${a.color}-600`}>{a.value || 0}</div>
-                      <div className="text-xs text-gray-600">{a.label}</div>
+                      <div className="text-xs text-navy/70">{a.label}</div>
                     </div>
                   ))}
                 </div>
@@ -403,8 +403,8 @@ export default function Raport() {
               {/* Notes */}
               {detail.raport?.notes && (
                 <div>
-                  <h3 className="font-semibold text-gray-800 mb-2">Catatan</h3>
-                  <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-4">{detail.raport.notes}</p>
+                  <h3 className="font-semibold text-navy mb-2">Catatan</h3>
+                  <p className="text-sm text-navy/70 bg-cream-soft rounded-xl p-4">{detail.raport.notes}</p>
                 </div>
               )}
             </div>

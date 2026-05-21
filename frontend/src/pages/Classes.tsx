@@ -45,7 +45,7 @@ export default function Classes() {
           { key: 'homeroom', label: 'Wali Kelas', render: (_, row) => row.teacher?.user?.name || '-' },
           { key: 'manage', label: 'Siswa', render: (_, row) => (
             <button onClick={(e) => { e.stopPropagation(); setManageClass(row) }}
-              className="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 text-sm font-medium">
+              className="flex items-center gap-1 px-3 py-1.5 bg-mint/10 text-mint rounded-lg hover:bg-green-100 text-sm font-medium">
               <Users className="w-4 h-4" /> Kelola
             </button>
           )},
@@ -143,45 +143,45 @@ function ManageStudentsModal({ classData, onClose }: { classData: any; onClose: 
         <div className="p-5 border-b flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold">Kelola Siswa &mdash; {classData.name}</h2>
-            <p className="text-sm text-gray-500">{classStudents.length} siswa terdaftar</p>
+            <p className="text-sm text-navy/60">{classStudents.length} siswa terdaftar</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 hover:bg-amber-soft/40 rounded-lg"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="flex border-b">
           <button onClick={() => { setTab('current'); setSearch(''); setSelected(new Set()) }}
-            className={`flex-1 py-3 text-sm font-medium ${tab === 'current' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-500'}`}>
+            className={`flex-1 py-3 text-sm font-medium ${tab === 'current' ? 'border-b-2 border-amber-warm text-amber-warm' : 'text-navy/60'}`}>
             Siswa di Kelas ({classStudents.length})
           </button>
           <button onClick={() => { setTab('add'); setSearch(''); setSelected(new Set()) }}
-            className={`flex-1 py-3 text-sm font-medium ${tab === 'add' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-500'}`}>
+            className={`flex-1 py-3 text-sm font-medium ${tab === 'add' ? 'border-b-2 border-amber-warm text-amber-warm' : 'text-navy/60'}`}>
             <Plus className="w-4 h-4 inline mr-1" /> Tambah Siswa
           </button>
         </div>
 
         <div className="p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari nama atau NIS..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-warm/60 text-sm focus:ring-2 focus:ring-amber-warm/40 outline-none" />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pb-4">
           {loading ? (
-            <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-indigo-500" /></div>
+            <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-amber-warm" /></div>
           ) : tab === 'current' ? (
             filteredCurrent.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">Belum ada siswa di kelas ini</div>
+              <div className="text-center text-navy/40 py-8">Belum ada siswa di kelas ini</div>
             ) : (
               <div className="space-y-2">
                 {filteredCurrent.map(s => (
-                  <div key={s.id} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gray-50">
+                  <div key={s.id} className="flex items-center justify-between p-3 rounded-xl border border-warm/40 hover:bg-cream-soft">
                     <div>
                       <div className="font-medium text-sm">{s.user?.name || '-'}</div>
-                      <div className="text-xs text-gray-400">NIS: {s.nis || '-'}</div>
+                      <div className="text-xs text-navy/40">NIS: {s.nis || '-'}</div>
                     </div>
-                    <button onClick={() => removeStudent(s.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                    <button onClick={() => removeStudent(s.id)} className="p-2 text-rose hover:bg-rose/10 rounded-lg">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -190,21 +190,21 @@ function ManageStudentsModal({ classData, onClose }: { classData: any; onClose: 
             )
           ) : (
             filteredAvailable.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">Semua siswa sudah punya kelas</div>
+              <div className="text-center text-navy/40 py-8">Semua siswa sudah punya kelas</div>
             ) : (
               <div className="space-y-2">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs text-gray-500">{selected.size} dipilih</span>
-                  <button onClick={() => selectAll(availableStudents)} className="text-xs text-indigo-600 hover:underline">Pilih Semua</button>
+                  <span className="text-xs text-navy/60">{selected.size} dipilih</span>
+                  <button onClick={() => selectAll(availableStudents)} className="text-xs text-amber-warm hover:underline">Pilih Semua</button>
                 </div>
                 {filteredAvailable.map(s => (
                   <div key={s.id} onClick={() => toggleSelect(s.id)}
-                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${selected.has(s.id) ? 'border-indigo-400 bg-indigo-50' : 'border-gray-100 hover:bg-gray-50'}`}>
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${selected.has(s.id) ? 'border-amber-warm bg-amber-soft/40' : 'border-warm/40 hover:bg-cream-soft'}`}>
                     <input type="checkbox" checked={selected.has(s.id)} readOnly
-                      className="w-4 h-4 rounded border-gray-300 text-indigo-600" />
+                      className="w-4 h-4 rounded border-warm/60 text-amber-warm" />
                     <div className="flex-1">
                       <div className="font-medium text-sm">{s.user?.name || '-'}</div>
-                      <div className="text-xs text-gray-400">NIS: {s.nis || '-'} {s.class?.name ? `(sekarang: ${s.class.name})` : '(belum ada kelas)'}</div>
+                      <div className="text-xs text-navy/40">NIS: {s.nis || '-'} {s.class?.name ? `(sekarang: ${s.class.name})` : '(belum ada kelas)'}</div>
                     </div>
                   </div>
                 ))}
@@ -216,7 +216,7 @@ function ManageStudentsModal({ classData, onClose }: { classData: any; onClose: 
         {tab === 'add' && selected.size > 0 && (
           <div className="p-4 border-t">
             <button onClick={assignSelected} disabled={saving}
-              className="w-full py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2">
+              className="w-full py-2.5 gradient-warm text-white rounded-xl hover:bg-amber-warm disabled:opacity-50 flex items-center justify-center gap-2">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               Tambahkan {selected.size} Siswa ke Kelas
             </button>

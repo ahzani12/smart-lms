@@ -23,13 +23,13 @@ interface OptLite { id: number; name?: string; user?: { name: string } }
 
 const DAYS = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
 const DAY_COLORS: Record<number, string> = {
-  1: 'bg-blue-50 border-blue-200',
-  2: 'bg-green-50 border-green-200',
-  3: 'bg-yellow-50 border-yellow-200',
+  1: 'bg-sky-warm/10 border-blue-200',
+  2: 'bg-mint/10 border-green-200',
+  3: 'bg-amber-soft/40 border-yellow-200',
   4: 'bg-purple-50 border-purple-200',
   5: 'bg-pink-50 border-pink-200',
-  6: 'bg-indigo-50 border-indigo-200',
-  7: 'bg-gray-50 border-gray-200',
+  6: 'bg-amber-soft/40 border-warm',
+  7: 'bg-cream-soft border-warm/60',
 }
 
 export default function Schedules() {
@@ -90,12 +90,12 @@ export default function Schedules() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Jadwal Mengajar</h1>
-          <div className="text-sm text-gray-500">Jadwal pelajaran per kelas & guru</div>
+          <h1 className="text-2xl font-bold text-navy">Jadwal Mengajar</h1>
+          <div className="text-sm text-navy/60">Jadwal pelajaran per kelas & guru</div>
         </div>
         <button
           onClick={() => { setEditing(null); setShowForm(true) }}
-          className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-2"
+          className="px-4 py-2 rounded-xl gradient-warm text-white hover:shadow-warm flex items-center gap-2"
         >
           <Plus className="w-4 h-4" /> Tambah Jadwal
         </button>
@@ -104,51 +104,51 @@ export default function Schedules() {
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
         <select value={filterClass} onChange={e => setFilterClass(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-sm">
+                className="px-3 py-2 border border-warm/60 rounded-xl text-sm">
           <option value="">Semua Kelas</option>
           {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         <select value={filterTeacher} onChange={e => setFilterTeacher(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-sm">
+                className="px-3 py-2 border border-warm/60 rounded-xl text-sm">
           <option value="">Semua Guru</option>
           {teachers.map(t => <option key={t.id} value={t.id}>{t.user?.name}</option>)}
         </select>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
+        <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-amber-warm" /></div>
       ) : items.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
-          <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+        <div className="bg-white rounded-2xl border border-warm/40 p-12 text-center text-navy/40">
+          <Calendar className="w-12 h-12 mx-auto mb-3 text-navy/25" />
           Belum ada jadwal. Klik "Tambah Jadwal" untuk mulai.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map(d => (
             <div key={d} className={`rounded-2xl border-2 ${DAY_COLORS[d]} p-4`}>
-              <h3 className="font-bold text-gray-900 mb-3">{DAYS[d]}</h3>
+              <h3 className="font-bold text-navy mb-3">{DAYS[d]}</h3>
               {(!grouped[d] || grouped[d].length === 0) ? (
-                <div className="text-xs text-gray-400">Kosong</div>
+                <div className="text-xs text-navy/40">Kosong</div>
               ) : (
                 <div className="space-y-2">
                   {grouped[d].map(s => (
-                    <div key={s.id} className="bg-white rounded-xl p-3 border border-gray-100 text-sm">
+                    <div key={s.id} className="bg-white rounded-xl p-3 border border-warm/40 text-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="font-semibold text-gray-900">{s.subject?.name}</div>
-                          <div className="text-xs text-gray-600 mt-0.5">{s.class?.name} · {s.teacher?.user?.name}</div>
-                          <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                          <div className="font-semibold text-navy">{s.subject?.name}</div>
+                          <div className="text-xs text-navy/70 mt-0.5">{s.class?.name} · {s.teacher?.user?.name}</div>
+                          <div className="flex items-center gap-3 text-xs text-navy/60 mt-1">
                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.start_time}–{s.end_time}</span>
                             {s.room && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{s.room}</span>}
                           </div>
                         </div>
                         <div className="flex gap-1 ml-2">
                           <button onClick={() => { setEditing(s); setShowForm(true) }}
-                                  className="p-1 hover:bg-indigo-50 rounded text-indigo-600" title="Edit">
+                                  className="p-1 hover:bg-amber-soft/40 rounded text-amber-warm" title="Edit">
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
                           <button onClick={() => handleDelete(s.id)}
-                                  className="p-1 hover:bg-red-50 rounded text-red-600" title="Hapus">
+                                  className="p-1 hover:bg-rose/10 rounded text-rose" title="Hapus">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -230,70 +230,70 @@ function ScheduleForm({ initial, classes, subjects, teachers, semesters, onClose
       <div className="bg-white rounded-2xl w-full max-w-lg p-5 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">{initial ? 'Edit Jadwal' : 'Tambah Jadwal'}</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 hover:bg-amber-soft/40 rounded-lg"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2">
-            <label className="text-xs text-gray-600">Semester</label>
+            <label className="text-xs text-navy/70">Semester</label>
             <select value={form.semester_id} onChange={e => setForm({ ...form, semester_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">
+                    className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm">
               <option value="">Pilih semester...</option>
               {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-600">Kelas</label>
+            <label className="text-xs text-navy/70">Kelas</label>
             <select value={form.class_id} onChange={e => setForm({ ...form, class_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">
+                    className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm">
               <option value="">Pilih...</option>
               {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-600">Mata Pelajaran</label>
+            <label className="text-xs text-navy/70">Mata Pelajaran</label>
             <select value={form.subject_id} onChange={e => setForm({ ...form, subject_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">
+                    className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm">
               <option value="">Pilih...</option>
               {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div className="col-span-2">
-            <label className="text-xs text-gray-600">Guru</label>
+            <label className="text-xs text-navy/70">Guru</label>
             <select value={form.teacher_id} onChange={e => setForm({ ...form, teacher_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">
+                    className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm">
               <option value="">Pilih...</option>
               {teachers.map(t => <option key={t.id} value={t.id}>{t.user?.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-600">Hari</label>
+            <label className="text-xs text-navy/70">Hari</label>
             <select value={form.day_of_week} onChange={e => setForm({ ...form, day_of_week: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">
+                    className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm">
               {[1,2,3,4,5,6].map(d => <option key={d} value={d}>{DAYS[d]}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-600">Ruangan</label>
+            <label className="text-xs text-navy/70">Ruangan</label>
             <input type="text" value={form.room} onChange={e => setForm({ ...form, room: e.target.value })}
-                   placeholder="R. 101" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+                   placeholder="R. 101" className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm" />
           </div>
           <div>
-            <label className="text-xs text-gray-600">Jam Mulai</label>
+            <label className="text-xs text-navy/70">Jam Mulai</label>
             <input type="time" value={form.start_time} onChange={e => setForm({ ...form, start_time: e.target.value })}
-                   className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+                   className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm" />
           </div>
           <div>
-            <label className="text-xs text-gray-600">Jam Selesai</label>
+            <label className="text-xs text-navy/70">Jam Selesai</label>
             <input type="time" value={form.end_time} onChange={e => setForm({ ...form, end_time: e.target.value })}
-                   className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+                   className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm" />
           </div>
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50">Batal</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-xl border border-warm/60 hover:bg-cream-soft">Batal</button>
           <button onClick={submit} disabled={saving}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50">
+                  className="px-4 py-2 rounded-xl gradient-warm text-white hover:shadow-warm disabled:opacity-50">
             {saving ? 'Menyimpan...' : (initial ? 'Update' : 'Simpan')}
           </button>
         </div>

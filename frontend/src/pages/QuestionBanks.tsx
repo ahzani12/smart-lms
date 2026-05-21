@@ -32,9 +32,9 @@ interface BankItem {
 }
 
 const DIFF_COLOR: Record<string, string> = {
-  mudah: 'bg-green-100 text-green-700',
-  sedang: 'bg-yellow-100 text-yellow-700',
-  sulit: 'bg-red-100 text-red-700',
+  mudah: 'bg-mint/15 text-mint',
+  sedang: 'bg-amber-warm/15 text-amber-warm',
+  sulit: 'bg-rose/15 text-rose',
 }
 
 export default function QuestionBanks() {
@@ -113,44 +113,44 @@ export default function QuestionBanks() {
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Bank Soal</h1>
-        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">
+        <h1 className="text-2xl font-bold text-navy">Bank Soal</h1>
+        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 gradient-warm text-white rounded-xl hover:bg-amber-warm">
           <Plus className="w-4 h-4" /> Bank Baru
         </button>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-navy/40" />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari bank soal..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
+        <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-amber-warm" /></div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-white rounded-2xl border border-warm/40 p-12 text-center text-navy/40">
           Belum ada bank soal. Klik "Bank Baru" untuk mulai.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(b => (
-            <div key={b.id} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition cursor-pointer group"
+            <div key={b.id} className="bg-white rounded-2xl border border-warm/40 p-5 hover:shadow-md transition cursor-pointer group"
               onClick={() => { setActiveBankId(b.id); setView('detail') }}>
               <div className="flex items-start justify-between mb-2">
-                <div className="p-2 bg-indigo-50 rounded-lg"><BookOpen className="w-5 h-5 text-indigo-600" /></div>
+                <div className="p-2 bg-amber-soft/40 rounded-lg"><BookOpen className="w-5 h-5 text-amber-warm" /></div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
                   <button onClick={(e) => { e.stopPropagation(); openEdit(b) }}
-                    className="p-1.5 hover:bg-gray-100 rounded"><Edit2 className="w-4 h-4 text-gray-500" /></button>
+                    className="p-1.5 hover:bg-amber-soft/40 rounded"><Edit2 className="w-4 h-4 text-navy/60" /></button>
                   <button onClick={(e) => { e.stopPropagation(); del(b.id) }}
-                    className="p-1.5 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4 text-red-500" /></button>
+                    className="p-1.5 hover:bg-rose/10 rounded"><Trash2 className="w-4 h-4 text-rose" /></button>
                 </div>
               </div>
-              <div className="font-semibold text-gray-900 mb-1">{b.title}</div>
-              {b.description && <div className="text-sm text-gray-500 mb-3 line-clamp-2">{b.description}</div>}
+              <div className="font-semibold text-navy mb-1">{b.title}</div>
+              {b.description && <div className="text-sm text-navy/60 mb-3 line-clamp-2">{b.description}</div>}
               <div className="flex items-center gap-2 text-xs flex-wrap">
-                <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded">{b.subject?.name || '-'}</span>
-                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded">{b.level || '-'}</span>
-                <span className="text-gray-400 ml-auto">{b.item_count ?? 0} soal</span>
+                <span className="px-2 py-0.5 bg-amber-soft/40 text-amber-warm rounded">{b.subject?.name || '-'}</span>
+                <span className="px-2 py-0.5 bg-amber-soft/40 text-navy/70 rounded">{b.level || '-'}</span>
+                <span className="text-navy/40 ml-auto">{b.item_count ?? 0} soal</span>
               </div>
             </div>
           ))}
@@ -162,34 +162,34 @@ export default function QuestionBanks() {
           <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold">{editBank ? 'Edit' : 'Buat'} Bank Soal</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-amber-soft/40 rounded-lg"><X className="w-5 h-5" /></button>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Judul</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Judul</label>
               <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200" />
+                className="w-full px-4 py-2.5 rounded-xl border border-warm/60" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mapel</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Mapel</label>
               <select value={form.subject_id} onChange={e => setForm({ ...form, subject_id: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                className="w-full px-4 py-2.5 rounded-xl border border-warm/60">
                 <option value="">Pilih mapel...</option>
                 {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jenjang</label>
+                <label className="block text-sm font-medium text-navy/80 mb-1">Jenjang</label>
                 <select value={form.level} onChange={e => setForm({ ...form, level: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                  className="w-full px-4 py-2.5 rounded-xl border border-warm/60">
                   <option value="X">X</option><option value="XI">XI</option><option value="XII">XII</option>
                   <option value="all">Semua</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                <label className="block text-sm font-medium text-navy/80 mb-1">Visibility</label>
                 <select value={form.visibility} onChange={e => setForm({ ...form, visibility: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200">
+                  className="w-full px-4 py-2.5 rounded-xl border border-warm/60">
                   <option value="private">Private</option>
                   <option value="school">Sekolah</option>
                   <option value="public">Public</option>
@@ -197,13 +197,13 @@ export default function QuestionBanks() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Deskripsi</label>
               <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                rows={3} className="w-full px-4 py-2.5 rounded-xl border border-gray-200" />
+                rows={3} className="w-full px-4 py-2.5 rounded-xl border border-warm/60" />
             </div>
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50">Batal</button>
-              <button onClick={save} className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Simpan</button>
+              <button onClick={() => setShowModal(false)} className="flex-1 py-2.5 rounded-xl border border-warm/60 hover:bg-cream-soft">Batal</button>
+              <button onClick={save} className="flex-1 py-2.5 rounded-xl gradient-warm text-white hover:shadow-warm">Simpan</button>
             </div>
           </div>
         </div>
@@ -244,60 +244,60 @@ function BankDetail({ bankId, subjects, onBack }: { bankId: number; subjects: Su
   }
 
   if (loading || !bank) {
-    return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
+    return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-amber-warm" /></div>
   }
 
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="p-2 rounded-lg hover:bg-gray-100"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={onBack} className="p-2 rounded-lg hover:bg-amber-soft/40"><ArrowLeft className="w-5 h-5" /></button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900">{bank.title}</h1>
-          <div className="text-sm text-gray-500">{bank.subject?.name} • {bank.level} • {items.length} soal</div>
+          <h1 className="text-2xl font-bold text-navy">{bank.title}</h1>
+          <div className="text-sm text-navy/60">{bank.subject?.name} • {bank.level} • {items.length} soal</div>
         </div>
         <button onClick={() => { setEditQ(null); setShowQEdit(true) }}
-          className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 flex items-center gap-2">
+          className="px-4 py-2 bg-white border border-warm/60 text-navy/80 rounded-xl hover:bg-cream-soft flex items-center gap-2">
           <Plus className="w-4 h-4" /> Soal Baru
         </button>
         <button onClick={() => setShowPicker(true)}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center gap-2">
+          className="px-4 py-2 gradient-warm text-white rounded-xl hover:bg-amber-warm flex items-center gap-2">
           <Layers className="w-4 h-4" /> Pilih dari Pool
         </button>
       </div>
 
       {items.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
+        <div className="bg-white rounded-2xl border border-warm/40 p-12 text-center text-navy/40">
           Bank ini masih kosong. Tambah soal baru atau pilih dari pool.
         </div>
       ) : (
         <div className="space-y-3">
           {items.map((it, idx) => (
-            <div key={it.id} className="bg-white rounded-2xl border border-gray-100 p-4">
+            <div key={it.id} className="bg-white rounded-2xl border border-warm/40 p-4">
               <div className="flex items-start gap-3">
-                <div className="flex-none w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 font-semibold flex items-center justify-center text-sm">{idx + 1}</div>
+                <div className="flex-none w-8 h-8 rounded-lg bg-amber-soft/40 text-amber-warm font-semibold flex items-center justify-center text-sm">{idx + 1}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="text-xs px-2 py-0.5 bg-gray-100 rounded">{it.question?.type || '-'}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded ${DIFF_COLOR[it.question?.difficulty || ''] || 'bg-gray-100'}`}>
+                    <span className="text-xs px-2 py-0.5 bg-amber-soft/40 rounded">{it.question?.type || '-'}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded ${DIFF_COLOR[it.question?.difficulty || ''] || 'bg-amber-soft/40'}`}>
                       {it.question?.difficulty || '-'}
                     </span>
-                    <span className="text-xs text-gray-400">{it.question?.points || 0} poin</span>
+                    <span className="text-xs text-navy/40">{it.question?.points || 0} poin</span>
                     {it.question?.topics?.map(t => (
-                      <span key={t.id} className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded">{t.code} {t.name}</span>
+                      <span key={t.id} className="text-xs px-2 py-0.5 bg-purple-50 text-coral rounded">{t.code} {t.name}</span>
                     ))}
                   </div>
-                  <div className="text-sm text-gray-900 whitespace-pre-wrap">{it.question?.content}</div>
+                  <div className="text-sm text-navy whitespace-pre-wrap">{it.question?.content}</div>
                   {it.question?.options && (
-                    <div className="mt-2 text-xs text-gray-500">
-                      Pilihan tersedia, jawaban: <span className="font-semibold text-gray-700">{it.question?.answer}</span>
+                    <div className="mt-2 text-xs text-navy/60">
+                      Pilihan tersedia, jawaban: <span className="font-semibold text-navy/80">{it.question?.answer}</span>
                     </div>
                   )}
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => { setEditQ(it.question!); setShowQEdit(true) }}
-                    className="p-1.5 hover:bg-gray-100 rounded"><Edit2 className="w-4 h-4 text-gray-500" /></button>
+                    className="p-1.5 hover:bg-amber-soft/40 rounded"><Edit2 className="w-4 h-4 text-navy/60" /></button>
                   <button onClick={() => removeItem(it.id)}
-                    className="p-1.5 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4 text-red-500" /></button>
+                    className="p-1.5 hover:bg-rose/10 rounded"><Trash2 className="w-4 h-4 text-rose" /></button>
                 </div>
               </div>
             </div>
@@ -396,7 +396,7 @@ function PoolPicker({ bankId, subjectId, existingIds, onClose, onDone }:
     const isActive = activeTopic === t.id
     return (
       <div key={t.id}>
-        <div className={`flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer text-sm ${isActive ? 'bg-indigo-100 text-indigo-700 font-medium' : 'hover:bg-gray-100'}`}
+        <div className={`flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer text-sm ${isActive ? 'bg-amber-soft text-amber-warm font-medium' : 'hover:bg-amber-soft/40'}`}
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
           onClick={() => { setActiveTopic(isActive ? null : t.id); setPage(1) }}>
           {kids.length > 0 ? (
@@ -411,7 +411,7 @@ function PoolPicker({ bankId, subjectId, existingIds, onClose, onDone }:
               {isOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
             </button>
           ) : <span className="w-4" />}
-          <span className="font-mono text-xs text-gray-400">{t.code}</span>
+          <span className="font-mono text-xs text-navy/40">{t.code}</span>
           <span className="truncate">{t.name}</span>
         </div>
         {isOpen && kids.map(k => renderTopic(k, depth + 1))}
@@ -424,27 +424,27 @@ function PoolPicker({ bankId, subjectId, existingIds, onClose, onDone }:
       <div className="bg-white rounded-2xl w-full max-w-6xl h-[85vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-bold">Pilih Soal dari Pool</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 hover:bg-amber-soft/40 rounded-lg"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="flex-1 flex overflow-hidden">
           {/* Left: Topic tree */}
           <div className="w-64 border-r flex flex-col">
             <div className="p-3 border-b flex items-center justify-between">
-              <div className="text-xs font-semibold text-gray-500 uppercase">Topik / KD</div>
+              <div className="text-xs font-semibold text-navy/60 uppercase">Topik / KD</div>
               <button onClick={() => setShowTopicModal(true)}
-                className="p-1 hover:bg-gray-100 rounded" title="Tambah topik baru">
-                <Plus className="w-4 h-4 text-gray-500" />
+                className="p-1 hover:bg-amber-soft/40 rounded" title="Tambah topik baru">
+                <Plus className="w-4 h-4 text-navy/60" />
               </button>
             </div>
             <div className="flex-1 overflow-auto p-2 space-y-0.5">
-              <div className={`px-2 py-1.5 rounded-lg cursor-pointer text-sm ${!activeTopic ? 'bg-indigo-100 text-indigo-700 font-medium' : 'hover:bg-gray-100'}`}
+              <div className={`px-2 py-1.5 rounded-lg cursor-pointer text-sm ${!activeTopic ? 'bg-amber-soft text-amber-warm font-medium' : 'hover:bg-amber-soft/40'}`}
                 onClick={() => { setActiveTopic(null); setPage(1) }}>
                 Semua Topik
               </div>
               {rootTopics.map(t => renderTopic(t))}
               {topics.length === 0 && (
-                <div className="text-center text-xs text-gray-400 py-4">Belum ada topik</div>
+                <div className="text-center text-xs text-navy/40 py-4">Belum ada topik</div>
               )}
             </div>
           </div>
@@ -453,15 +453,15 @@ function PoolPicker({ bankId, subjectId, existingIds, onClose, onDone }:
           <div className="flex-1 flex flex-col">
             <div className="p-3 border-b flex gap-2 flex-wrap">
               <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/40" />
                 <input value={filters.search}
                   onChange={e => { setFilters({ ...filters, search: e.target.value }); setPage(1) }}
                   placeholder="Cari soal..."
-                  className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-gray-200 text-sm" />
+                  className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-warm/60 text-sm" />
               </div>
               <select value={filters.difficulty}
                 onChange={e => { setFilters({ ...filters, difficulty: e.target.value }); setPage(1) }}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm">
+                className="px-3 py-1.5 rounded-lg border border-warm/60 text-sm">
                 <option value="">Semua Kesulitan</option>
                 <option value="mudah">Mudah</option>
                 <option value="sedang">Sedang</option>
@@ -469,7 +469,7 @@ function PoolPicker({ bankId, subjectId, existingIds, onClose, onDone }:
               </select>
               <select value={filters.type}
                 onChange={e => { setFilters({ ...filters, type: e.target.value }); setPage(1) }}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm">
+                className="px-3 py-1.5 rounded-lg border border-warm/60 text-sm">
                 <option value="">Semua Tipe</option>
                 <option value="pilihan_ganda">Pilgan</option>
                 <option value="essay">Essay</option>
@@ -479,9 +479,9 @@ function PoolPicker({ bankId, subjectId, existingIds, onClose, onDone }:
 
             <div className="flex-1 overflow-auto p-3 space-y-2">
               {loading ? (
-                <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-indigo-500" /></div>
+                <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-amber-warm" /></div>
               ) : questions.length === 0 ? (
-                <div className="text-center text-gray-400 py-8 text-sm">Tidak ada soal yang cocok.</div>
+                <div className="text-center text-navy/40 py-8 text-sm">Tidak ada soal yang cocok.</div>
               ) : questions.map(q => {
                 const isIn = existingIds.has(q.id)
                 const isSel = selected.has(q.id)
@@ -489,27 +489,27 @@ function PoolPicker({ bankId, subjectId, existingIds, onClose, onDone }:
                   <div key={q.id}
                     onClick={() => !isIn && toggle(q.id)}
                     className={`p-3 rounded-lg border cursor-pointer text-sm ${
-                      isIn ? 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed' :
-                      isSel ? 'bg-indigo-50 border-indigo-300 ring-1 ring-indigo-300' : 'bg-white border-gray-200 hover:border-indigo-300'
+                      isIn ? 'bg-cream-soft border-warm/60 opacity-60 cursor-not-allowed' :
+                      isSel ? 'bg-amber-soft/40 border-indigo-300 ring-1 ring-amber-warm/30' : 'bg-white border-warm/60 hover:border-indigo-300'
                     }`}>
                     <div className="flex items-start gap-2">
                       <div className={`flex-none w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
                         isIn ? 'bg-green-100 border-green-300' :
-                        isSel ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300'
+                        isSel ? 'gradient-warm border-amber-warm' : 'border-warm/60'
                       }`}>
                         {(isSel || isIn) && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap text-xs">
-                          <span className="px-1.5 py-0.5 bg-gray-100 rounded">{q.type}</span>
-                          <span className={`px-1.5 py-0.5 rounded ${DIFF_COLOR[q.difficulty] || 'bg-gray-100'}`}>{q.difficulty}</span>
-                          <span className="text-gray-400">{q.points}p</span>
-                          {isIn && <span className="text-green-600 font-medium">sudah di bank</span>}
+                          <span className="px-1.5 py-0.5 bg-amber-soft/40 rounded">{q.type}</span>
+                          <span className={`px-1.5 py-0.5 rounded ${DIFF_COLOR[q.difficulty] || 'bg-amber-soft/40'}`}>{q.difficulty}</span>
+                          <span className="text-navy/40">{q.points}p</span>
+                          {isIn && <span className="text-mint font-medium">sudah di bank</span>}
                           {q.topics?.map(t => (
-                            <span key={t.id} className="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded">{t.code}</span>
+                            <span key={t.id} className="px-1.5 py-0.5 bg-purple-50 text-coral rounded">{t.code}</span>
                           ))}
                         </div>
-                        <div className="text-gray-900 line-clamp-2">{q.content}</div>
+                        <div className="text-navy line-clamp-2">{q.content}</div>
                       </div>
                     </div>
                   </div>
@@ -518,25 +518,25 @@ function PoolPicker({ bankId, subjectId, existingIds, onClose, onDone }:
             </div>
 
             <div className="p-3 border-t flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-sm text-navy/60">
                 <Filter className="w-4 h-4" />
                 {total} soal • {selected.size} dipilih
               </div>
               <div className="flex items-center gap-2">
                 <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
-                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-40">Prev</button>
-                <span className="text-sm text-gray-500">hal {page}</span>
+                  className="px-3 py-1.5 text-sm rounded-lg border border-warm/60 disabled:opacity-40">Prev</button>
+                <span className="text-sm text-navy/60">hal {page}</span>
                 <button disabled={page * 20 >= total} onClick={() => setPage(p => p + 1)}
-                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-40">Next</button>
+                  className="px-3 py-1.5 text-sm rounded-lg border border-warm/60 disabled:opacity-40">Next</button>
               </div>
             </div>
           </div>
         </div>
 
         <div className="p-4 border-t flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50">Batal</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-xl border border-warm/60 hover:bg-cream-soft">Batal</button>
           <button onClick={addSelected} disabled={selected.size === 0}
-            className="px-6 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50">
+            className="px-6 py-2 rounded-xl gradient-warm text-white hover:shadow-warm disabled:opacity-50">
             Tambahkan {selected.size > 0 && `(${selected.size})`}
           </button>
         </div>
@@ -578,7 +578,7 @@ function TopicEditor({ subjectId, parentOptions, onClose, onSaved }:
       <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-bold">Topik Baru</h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 hover:bg-amber-soft/40 rounded"><X className="w-5 h-5" /></button>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -609,7 +609,7 @@ function TopicEditor({ subjectId, parentOptions, onClose, onSaved }:
         </div>
         <div className="flex gap-2 pt-2">
           <button onClick={onClose} className="flex-1 py-2 rounded-xl border">Batal</button>
-          <button onClick={save} className="flex-1 py-2 rounded-xl bg-indigo-600 text-white">Simpan</button>
+          <button onClick={save} className="flex-1 py-2 rounded-xl gradient-warm text-white">Simpan</button>
         </div>
       </div>
     </div>
@@ -681,7 +681,7 @@ function QuestionEditor({ bankId, subjectId, level, question, onClose, onSaved }
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b sticky top-0 bg-white">
           <h2 className="text-lg font-bold">{question ? 'Edit' : 'Buat'} Soal</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 hover:bg-amber-soft/40 rounded-lg"><X className="w-5 h-5" /></button>
         </div>
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-3 gap-3">
@@ -723,7 +723,7 @@ function QuestionEditor({ bankId, subjectId, level, question, onClose, onSaved }
                 {form.options.map((opt: any, i: number) => (
                   <div key={i} className="flex items-center gap-2">
                     <button onClick={() => setForm({ ...form, answer: opt.key })}
-                      className={`w-8 h-8 rounded-lg font-semibold text-sm ${form.answer === opt.key ? 'bg-green-100 text-green-700 ring-2 ring-green-400' : 'bg-gray-100 text-gray-500'}`}
+                      className={`w-8 h-8 rounded-lg font-semibold text-sm ${form.answer === opt.key ? 'bg-mint/15 text-mint ring-2 ring-green-400' : 'bg-amber-soft/40 text-navy/60'}`}
                       title="Tandai sebagai jawaban benar">
                       {opt.key}
                     </button>
@@ -736,7 +736,7 @@ function QuestionEditor({ bankId, subjectId, level, question, onClose, onSaved }
                   </div>
                 ))}
               </div>
-              <div className="text-xs text-gray-400 mt-1">Klik huruf untuk menandai jawaban benar.</div>
+              <div className="text-xs text-navy/40 mt-1">Klik huruf untuk menandai jawaban benar.</div>
             </div>
           )}
 
@@ -757,10 +757,10 @@ function QuestionEditor({ bankId, subjectId, level, question, onClose, onSaved }
           <div>
             <label className="block text-sm mb-1">Topik / KD</label>
             <div className="flex flex-wrap gap-2">
-              {topics.length === 0 && <span className="text-xs text-gray-400">Belum ada topik. Buat dulu lewat tombol di pool picker.</span>}
+              {topics.length === 0 && <span className="text-xs text-navy/40">Belum ada topik. Buat dulu lewat tombol di pool picker.</span>}
               {topics.map(t => (
                 <button key={t.id} onClick={() => toggleTopic(t.id)}
-                  className={`px-2 py-1 rounded-lg text-xs font-medium ${form.topic_ids.includes(t.id) ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                  className={`px-2 py-1 rounded-lg text-xs font-medium ${form.topic_ids.includes(t.id) ? 'bg-coral text-white' : 'bg-amber-soft/40 text-navy/70'}`}>
                   {t.code} {t.name}
                 </button>
               ))}
@@ -769,7 +769,7 @@ function QuestionEditor({ bankId, subjectId, level, question, onClose, onSaved }
         </div>
         <div className="px-6 py-4 border-t flex justify-end gap-3 sticky bottom-0 bg-white">
           <button onClick={onClose} className="px-4 py-2 rounded-xl border">Batal</button>
-          <button onClick={save} className="px-6 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
+          <button onClick={save} className="px-6 py-2 rounded-xl gradient-warm text-white hover:shadow-warm">
             {question ? 'Update' : 'Simpan'}
           </button>
         </div>

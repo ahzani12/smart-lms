@@ -1,58 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-/* Custom styles for Smart LMS */
-:root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --secondary: #f59e0b;
-  --success: #10b981;
-  --danger: #ef4444;
+/* ===== SSD Edu Warm Theme ===== */
+@theme {
+  --color-cream: #FFF8EE;
+  --color-cream-soft: #FFFBF3;
+  --color-navy: #0F1B3D;
+  --color-navy-soft: #1A2755;
+  --color-amber-warm: #F59E0B;
+  --color-amber-soft: #FEF3C7;
+  --color-amber-tint: #FDE68A;
+  --color-coral: #FB923C;
+  --color-mint: #10B981;
+  --color-rose: #F43F5E;
+  --color-sky: #38BDF8;
+
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #FFF8EE;
+  color: #0F1B3D;
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #FEF3C7; }
+::-webkit-scrollbar-thumb { background: #FDE68A; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #F59E0B; }
 
-/* Glass effect */
+/* Edu Warm utilities */
+.bg-cream { background-color: #FFF8EE; }
+.bg-cream-soft { background-color: #FFFBF3; }
+.bg-navy { background-color: #0F1B3D; }
+.bg-navy-soft { background-color: #1A2755; }
+.bg-amber-warm { background-color: #F59E0B; }
+.bg-amber-soft { background-color: #FEF3C7; }
+.bg-amber-tint { background-color: #FDE68A; }
+.bg-coral { background-color: #FB923C; }
+.bg-mint { background-color: #10B981; }
+.bg-rose { background-color: #F43F5E; }
+.bg-sky-warm { background-color: #38BDF8; }
+
+.text-navy { color: #0F1B3D; }
+.text-navy-soft { color: #1A2755; }
+.text-amber-warm { color: #F59E0B; }
+.text-coral { color: #FB923C; }
+.text-mint { color: #10B981; }
+.text-rose { color: #F43F5E; }
+.text-cream { color: #FFF8EE; }
+
+.border-warm { border-color: #FDE68A; }
+.border-navy { border-color: #0F1B3D; }
+.border-amber-warm { border-color: #F59E0B; }
+
+.shadow-warm { box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18); }
+.shadow-warm-sm { box-shadow: 0 4px 12px rgba(245, 158, 11, 0.10); }
+.shadow-card { box-shadow: 0 2px 12px rgba(15, 27, 61, 0.06); }
+.shadow-card-lg { box-shadow: 0 8px 28px rgba(15, 27, 61, 0.10); }
+
+.gradient-warm { background: linear-gradient(135deg, #F59E0B 0%, #FB923C 100%); }
+.gradient-cream { background: linear-gradient(135deg, #FEF3C7 0%, #FFF8EE 50%, #FED7AA 100%); }
+.gradient-navy { background: linear-gradient(135deg, #0F1B3D 0%, #1A2755 100%); }
+
+.grid-pattern {
+  background-image: radial-gradient(circle, rgba(253, 230, 138, 0.4) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.grid-pattern-soft {
+  background-image: radial-gradient(circle, rgba(245, 158, 11, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Legacy aliases (kept for unmigrated pages — Phase 2/3 will remove) */
+.gradient-primary { background: linear-gradient(135deg, #F59E0B 0%, #FB923C 100%); }
+.gradient-accent { background: linear-gradient(135deg, #FB923C 0%, #F43F5E 100%); }
+.gradient-success { background: linear-gradient(135deg, #10B981 0%, #38BDF8 100%); }
 .glass {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 248, 238, 0.7);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(253, 230, 138, 0.3);
 }
 
-/* Gradient backgrounds */
-.gradient-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+/* PWA safe area */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
 
-.gradient-accent {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.gradient-success {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-/* PWA safe area for notch/home indicator */
-.safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
+/* Hide scrollbar (horizontal pills) */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Mobile optimizations */
 @media (max-width: 1023px) {
-  /* Prevent text overflow */
   table { display: block; overflow-x: auto; }
-  
-  /* Better touch targets */
   button, a { min-height: 44px; }
-  
-  /* Fix modals on mobile */
   .fixed { -webkit-overflow-scrolling: touch; }
 }
 
+/* Subtle pulse for LIVE indicators */
+@keyframes warmPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.warm-pulse { animation: warmPulse 1.6s ease-in-out infinite; }

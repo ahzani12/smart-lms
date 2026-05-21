@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { Users, UserCircle, Building2, FileQuestion, TrendingUp, Calendar, Sparkles, Loader2 } from 'lucide-react'
+import {
+  Users, UserCircle, Building2, FileQuestion, TrendingUp, Calendar,
+  Sparkles, Loader2, ArrowUpRight, ClipboardCheck, ClipboardEdit,
+  GraduationCap, Trophy, Sun, Cloud, PartyPopper, ChevronRight,
+} from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { navItems } from '../components/Layout'
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null)
@@ -18,183 +21,334 @@ export default function Dashboard() {
       setStats(res.data)
       setLoading(false)
     }).catch(() => setLoading(false))
-    // Check holiday
     const today = new Date().toISOString().slice(0, 10)
-    axios.get('/api/calendar/check-holiday', { params: { date: today } }).then(r => setHoliday(r.data)).catch(() => {})
+    axios.get('/api/calendar/check-holiday', { params: { date: today } })
+      .then(r => setHoliday(r.data)).catch(() => {})
   }, [])
 
-  if (loading) return <div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full p-8">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-amber-warm mx-auto mb-3" strokeWidth={2.4} />
+          <p className="text-navy/60 text-sm font-semibold">Memuat dashboard...</p>
+        </div>
+      </div>
+    )
+  }
 
   const s = stats?.stats || {}
+  const a = stats?.attendance_today || {}
+  const totalAttendance = (a.hadir ?? 0) + (a.terlambat ?? 0) + (a.sakit ?? 0) + (a.izin ?? 0) + (a.alfa ?? 0)
+  const attendanceRate = totalAttendance > 0
+    ? Math.round(((a.hadir ?? 0) + (a.terlambat ?? 0)) / totalAttendance * 100)
+    : 0
+
+  // Greeting based on time
+  const hour = new Date().getHours()
+  const greeting = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam'
+  const GreetIcon = hour < 15 ? Sun : Cloud
+
+  const dateLabel = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  })
+
+  // Stat cards with mixed colors
   const statCards = [
-    { icon: Users, label: 'Siswa', value: s.students ?? 0, color: 'bg-blue-500' },
-    { icon: UserCircle, label: 'Guru', value: s.teachers ?? 0, color: 'bg-green-500' },
-    { icon: Building2, label: 'Kelas', value: s.classes ?? 0, color: 'bg-yellow-500' },
-    { icon: FileQuestion, label: 'Ujian Aktif', value: s.exams ?? 0, color: 'bg-purple-500' },
+    { icon: Users, label: 'Siswa', value: s.students ?? 0, accent: 'amber-warm', bg: 'bg-amber-soft', to: '/students', delta: '+12 minggu ini' },
+    { icon: UserCircle, label: 'Guru', value: s.teachers ?? 0, accent: 'mint', bg: 'bg-mint/10', to: '/teachers' },
+    { icon: Building2, label: 'Kelas', value: s.classes ?? 0, accent: 'navy', bg: 'bg-navy/5', to: '/classes' },
+    { icon: FileQuestion, label: 'Ujian Aktif', value: s.exams ?? 0, accent: 'coral', bg: 'bg-coral/10', to: '/exams', delta: 'Berlangsung sekarang' },
   ]
 
-  // Menu items for mobile grid - grouped
-  const menuItems = navItems.filter(item => item.to !== '/' && (!user?.role || item.roles.includes(user.role)))
-  const menuGroups = [
-    { title: 'Akademik', items: menuItems.filter(i => ['/students', '/teachers', '/classes', '/schedules'].includes(i.to)) },
-    { title: 'Penilaian', items: menuItems.filter(i => ['/exams', '/question-banks', '/input-scores', '/raport', '/generate-raport'].includes(i.to)) },
-    { title: 'Kehadiran', items: menuItems.filter(i => ['/attendance', '/calendar'].includes(i.to)) },
-    { title: 'Lainnya', items: menuItems.filter(i => !['/students', '/teachers', '/classes', '/schedules', '/exams', '/question-banks', '/input-scores', '/raport', '/generate-raport', '/attendance', '/calendar'].includes(i.to)) },
-  ].filter(g => g.items.length > 0)
+  const quickActions = [
+    { to: '/attendance', icon: ClipboardCheck, label: 'Absensi', color: 'gradient-warm' },
+    { to: '/input-scores', icon: ClipboardEdit, label: 'Input Nilai', color: 'bg-mint' },
+    { to: '/exams', icon: FileQuestion, label: 'Buat Ujian', color: 'bg-navy' },
+    { to: '/raport', icon: GraduationCap, label: 'Raport', color: 'bg-coral' },
+    { to: '/leaderboard', icon: Trophy, label: 'Leaderboard', color: 'bg-rose' },
+    { to: '/ai-hub', icon: Sparkles, label: 'AI Hub', color: 'bg-sky-warm' },
+  ]
+
+  const attendanceItems = [
+    { k: 'hadir', label: 'Hadir', color: 'bg-mint', text: 'text-mint', emoji: '✓' },
+    { k: 'terlambat', label: 'Terlambat', color: 'bg-amber-warm', text: 'text-amber-warm', emoji: '⏱' },
+    { k: 'sakit', label: 'Sakit', color: 'bg-sky-warm', text: 'text-sky-warm', emoji: '🤒' },
+    { k: 'izin', label: 'Izin', color: 'bg-navy', text: 'text-navy', emoji: '✋' },
+    { k: 'alfa', label: 'Alfa', color: 'bg-rose', text: 'text-rose', emoji: '✗' },
+  ]
 
   return (
-    <div className="p-4 lg:p-6 space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500">Selamat datang, {user?.name}</p>
-        </div>
-        <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-50 text-indigo-600">
-          <Sparkles className="w-4 h-4" />
-          <span className="text-sm font-medium">AI-powered</span>
+    <div className="p-4 lg:p-8 space-y-6 max-w-7xl mx-auto">
+      {/* ===== Hero Greeting Card ===== */}
+      <div className="relative overflow-hidden rounded-3xl bg-navy text-white p-6 lg:p-8 shadow-card-lg">
+        <div className="absolute inset-0 grid-pattern opacity-20"></div>
+        <div className="absolute -right-20 -top-20 w-72 h-72 bg-amber-warm/20 rounded-full blur-3xl"></div>
+        <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-coral/20 rounded-full blur-3xl"></div>
+
+        <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-warm/15 border border-amber-warm/30 rounded-full mb-4">
+              <GreetIcon className="w-3.5 h-3.5 text-amber-warm" strokeWidth={2.5} />
+              <span className="text-xs font-semibold text-amber-200 tracking-wide">{dateLabel}</span>
+            </div>
+            <h1 className="text-2xl lg:text-4xl font-extrabold leading-tight mb-2">
+              {greeting}, {user?.name?.split(' ')[0] || 'Admin'} 👋
+            </h1>
+            <p className="text-white/70 leading-relaxed max-w-lg">
+              {attendanceRate > 90
+                ? 'Kehadiran hari ini sangat baik. Semoga proses belajar lancar.'
+                : 'Yuk pantau kehadiran dan ujian hari ini agar tetap on track.'}
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate('/attendance')}
+              className="px-5 py-3 bg-amber-warm text-navy rounded-2xl font-bold text-sm hover:shadow-warm transition flex items-center gap-2"
+            >
+              <ClipboardCheck className="w-4 h-4" strokeWidth={2.5} /> Absensi
+            </button>
+            <button
+              onClick={() => navigate('/ai-hub')}
+              className="px-5 py-3 bg-white/10 border border-white/20 text-white rounded-2xl font-bold text-sm hover:bg-white/15 transition flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" strokeWidth={2.5} /> AI Hub
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Holiday Banner */}
+      {/* ===== Holiday Banner ===== */}
       {holiday?.is_holiday && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3">
-          <span className="text-2xl">🏖️</span>
+        <div className="bg-gradient-to-r from-coral/10 to-amber-soft border-2 border-coral/20 rounded-3xl p-5 flex items-center gap-4">
+          <div className="w-14 h-14 bg-coral/15 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <PartyPopper className="w-7 h-7 text-coral" strokeWidth={2.4} />
+          </div>
           <div>
-            <div className="font-semibold text-green-800">Hari Ini Libur</div>
-            <div className="text-sm text-green-600">{holiday.title}</div>
+            <div className="font-extrabold text-navy text-lg">Hari Ini Libur</div>
+            <div className="text-sm text-navy/70">{holiday.title}</div>
           </div>
         </div>
       )}
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* ===== Stat Cards ===== */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
         {statCards.map((card, i) => (
-          <div key={i} className="bg-white rounded-2xl p-4 lg:p-5 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs lg:text-sm text-gray-500">{card.label}</p>
-                <p className="text-2xl lg:text-3xl font-bold text-gray-900 mt-1">{card.value}</p>
+          <button
+            key={i}
+            onClick={() => navigate(card.to)}
+            className="group relative bg-white border border-warm/40 rounded-3xl p-4 lg:p-5 shadow-card hover:shadow-card-lg hover:-translate-y-0.5 transition-all text-left overflow-hidden"
+          >
+            <div className={`absolute -top-4 -right-4 w-20 h-20 ${card.bg} rounded-full opacity-60 group-hover:scale-110 transition-transform`}></div>
+            <div className="relative">
+              <div className={`w-11 h-11 ${card.bg} rounded-2xl flex items-center justify-center mb-3`}>
+                <card.icon className={`w-5 h-5 text-${card.accent}`} strokeWidth={2.4} />
               </div>
-              <div className={`${card.color} p-2.5 lg:p-3 rounded-xl`}>
-                <card.icon className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+              <div className="text-2xl lg:text-3xl font-extrabold text-navy leading-none">
+                {card.value}
               </div>
+              <div className="text-xs lg:text-sm text-navy/60 mt-1.5 font-semibold">{card.label}</div>
+              {card.delta && (
+                <div className="hidden lg:flex items-center gap-1 text-[10px] text-navy/40 mt-2">
+                  <ArrowUpRight className="w-3 h-3" /> {card.delta}
+                </div>
+              )}
             </div>
-          </div>
+          </button>
         ))}
       </div>
 
-      {/* Mobile Menu Grid - Grouped */}
-      <div className="lg:hidden space-y-4">
-        {menuGroups.map(group => (
-          <div key={group.title}>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{group.title}</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {group.items.map(item => (
-                <button
-                  key={item.to}
-                  onClick={() => navigate(item.to)}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white border border-gray-100 shadow-sm active:scale-95 transition-transform"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                    <item.icon className="w-5 h-5 text-indigo-600" />
-                  </div>
-                  <span className="text-[10px] text-gray-600 text-center leading-tight font-medium">{item.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+      {/* ===== Quick Actions (Mobile-friendly) ===== */}
+      <div className="bg-white border border-warm/40 rounded-3xl p-5 lg:p-6 shadow-card">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-extrabold text-navy text-base lg:text-lg">Aksi Cepat</h3>
+          <Sparkles className="w-4 h-4 text-amber-warm" strokeWidth={2.4} />
+        </div>
+        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+          {quickActions.map(action => (
+            <button
+              key={action.to}
+              onClick={() => navigate(action.to)}
+              className="group flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-amber-soft/40 transition active:scale-95"
+            >
+              <div className={`w-12 h-12 ${action.color} rounded-2xl flex items-center justify-center shadow-warm-sm group-hover:shadow-warm transition`}>
+                <action.icon className="w-5 h-5 text-white" strokeWidth={2.4} />
+              </div>
+              <span className="text-[11px] lg:text-xs font-bold text-navy text-center leading-tight">
+                {action.label}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Attendance Today */}
-      <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100">
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-indigo-500" />
-          Absensi Hari Ini
-        </h3>
-        <div className="grid grid-cols-3 lg:grid-cols-5 gap-2 lg:gap-3">
-          {[
-            { k: 'hadir', label: 'Hadir', color: 'bg-green-50 text-green-700' },
-            { k: 'terlambat', label: 'Terlambat', color: 'bg-yellow-50 text-yellow-700' },
-            { k: 'sakit', label: 'Sakit', color: 'bg-blue-50 text-blue-700' },
-            { k: 'izin', label: 'Izin', color: 'bg-purple-50 text-purple-700' },
-            { k: 'alfa', label: 'Alfa', color: 'bg-red-50 text-red-700' },
-          ].map(item => (
-            <div key={item.k} className={`${item.color} rounded-xl p-3 lg:p-4 text-center`}>
-              <div className="text-xl lg:text-2xl font-bold">{stats?.attendance_today?.[item.k] ?? 0}</div>
-              <div className="text-[10px] lg:text-xs mt-1">{item.label}</div>
+      {/* ===== Attendance Today ===== */}
+      <div className="bg-white border border-warm/40 rounded-3xl p-5 lg:p-6 shadow-card">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h3 className="font-extrabold text-navy text-base lg:text-lg flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-amber-warm" strokeWidth={2.4} />
+              Absensi Hari Ini
+            </h3>
+            <p className="text-xs text-navy/60 mt-0.5">{a.sessions ?? 0} sesi absen tercatat</p>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl lg:text-3xl font-extrabold text-mint">{attendanceRate}%</div>
+            <div className="text-[10px] text-navy/50 font-semibold">KEHADIRAN</div>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-2.5 bg-amber-soft rounded-full overflow-hidden mb-5 flex">
+          {attendanceItems.map(item => {
+            const count = a[item.k] ?? 0
+            const pct = totalAttendance > 0 ? (count / totalAttendance) * 100 : 0
+            if (pct === 0) return null
+            return (
+              <div
+                key={item.k}
+                className={`${item.color} h-full transition-all`}
+                style={{ width: `${pct}%` }}
+                title={`${item.label}: ${count}`}
+              />
+            )
+          })}
+        </div>
+
+        <div className="grid grid-cols-5 gap-2 lg:gap-3">
+          {attendanceItems.map(item => (
+            <div key={item.k} className="text-center">
+              <div className={`text-xl lg:text-2xl font-extrabold ${item.text}`}>
+                {a[item.k] ?? 0}
+              </div>
+              <div className="text-[10px] lg:text-xs text-navy/60 font-semibold mt-0.5">{item.label}</div>
             </div>
           ))}
         </div>
-        <div className="text-xs text-gray-400 mt-3">{stats?.attendance_today?.sessions ?? 0} sesi absen hari ini</div>
       </div>
 
-      {/* Charts - hidden on small mobile */}
-      <div className="hidden sm:grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Class Distribution */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-indigo-500" />
+      {/* ===== Charts row ===== */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        {/* Class distribution */}
+        <div className="bg-white border border-warm/40 rounded-3xl p-5 lg:p-6 shadow-card">
+          <h3 className="font-extrabold text-navy text-base mb-4 flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-amber-warm" strokeWidth={2.4} />
             Distribusi Siswa per Kelas
           </h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={stats?.class_distribution || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="class_name" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-              <Bar dataKey="student_count" fill="#6366f1" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {(stats?.class_distribution || []).length > 0 ? (
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={stats?.class_distribution || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#FDE68A" vertical={false} />
+                <XAxis dataKey="class_name" tick={{ fontSize: 11, fill: '#0F1B3D' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#0F1B3D' }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: '16px',
+                    border: '1px solid #FDE68A',
+                    boxShadow: '0 8px 28px rgba(15,27,61,0.10)',
+                    fontSize: 12,
+                    fontWeight: 600,
+                  }}
+                />
+                <Bar dataKey="student_count" fill="#F59E0B" radius={[10, 10, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="text-center py-12 text-navy/40 text-sm">Belum ada data kelas</div>
+          )}
         </div>
 
-        {/* Recent Exams */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-500" />
-            Ujian Terbaru
-          </h3>
-          <div className="space-y-3">
-            {(stats?.recent_exams || []).map((exam: any) => (
-              <div key={exam.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
-                <div>
-                  <p className="font-medium text-gray-900">{exam.title}</p>
-                  <p className="text-sm text-gray-500">{exam.subject?.name} • {exam.class?.name}</p>
+        {/* Recent exams */}
+        <div className="bg-white border border-warm/40 rounded-3xl p-5 lg:p-6 shadow-card">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-extrabold text-navy text-base flex items-center gap-2">
+              <FileQuestion className="w-5 h-5 text-amber-warm" strokeWidth={2.4} />
+              Ujian Terbaru
+            </h3>
+            <button
+              onClick={() => navigate('/exams')}
+              className="text-xs font-bold text-amber-warm hover:underline flex items-center gap-1"
+            >
+              Lihat semua <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="space-y-2.5">
+            {(stats?.recent_exams || []).slice(0, 5).map((exam: any) => (
+              <button
+                key={exam.id}
+                onClick={() => navigate('/exams')}
+                className="w-full flex items-center justify-between p-3 rounded-2xl bg-cream-soft hover:bg-amber-soft/50 transition border border-warm/30 text-left"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 bg-amber-soft rounded-xl flex items-center justify-center flex-shrink-0">
+                    <FileQuestion className="w-5 h-5 text-amber-warm" strokeWidth={2.2} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-navy text-sm truncate">{exam.title}</p>
+                    <p className="text-xs text-navy/60 truncate">
+                      {exam.subject?.name || '—'} · {exam.class?.name || '—'}
+                    </p>
+                  </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  exam.status === 'active' ? 'bg-green-100 text-green-700' :
-                  exam.status === 'ended' ? 'bg-gray-100 text-gray-600' :
-                  'bg-yellow-100 text-yellow-700'
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold flex-shrink-0 ml-2 ${
+                  exam.status === 'active' ? 'bg-mint/15 text-mint' :
+                  exam.status === 'ended' ? 'bg-navy/10 text-navy/60' :
+                  'bg-amber-soft text-amber-warm'
                 }`}>
-                  {exam.status === 'active' ? 'Berlangsung' : exam.status === 'ended' ? 'Selesai' : 'Draft'}
+                  {exam.status === 'active' ? 'BERLANGSUNG' : exam.status === 'ended' ? 'SELESAI' : 'DRAFT'}
                 </span>
-              </div>
+              </button>
             ))}
             {(!stats?.recent_exams || stats.recent_exams.length === 0) && (
-              <p className="text-gray-400 text-center py-4">Belum ada ujian</p>
+              <div className="text-center py-8">
+                <FileQuestion className="w-10 h-10 text-navy/20 mx-auto mb-2" />
+                <p className="text-navy/50 text-sm font-semibold">Belum ada ujian</p>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Upcoming Events */}
-      <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100">
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-indigo-500" />
-          Agenda Mendatang
-        </h3>
-        <div className="flex gap-3 overflow-x-auto pb-2">
+      {/* ===== Upcoming Events ===== */}
+      <div className="bg-white border border-warm/40 rounded-3xl p-5 lg:p-6 shadow-card">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-extrabold text-navy text-base flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-amber-warm" strokeWidth={2.4} />
+            Agenda Mendatang
+          </h3>
+          <button
+            onClick={() => navigate('/calendar')}
+            className="text-xs font-bold text-amber-warm hover:underline flex items-center gap-1"
+          >
+            Buka kalender <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
           {(stats?.upcoming_events || []).map((event: any) => (
-            <div key={event.id} className="flex-shrink-0 w-48 lg:w-56 p-3 lg:p-4 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100">
-              <p className="text-xs text-indigo-600 font-medium mb-1">
-                {new Date(event.start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-              </p>
-              <p className="font-medium text-gray-900 text-sm">{event.title}</p>
-              <p className="text-xs text-gray-500 mt-1 capitalize">{event.type}</p>
+            <div
+              key={event.id}
+              className="flex-shrink-0 w-52 lg:w-56 p-4 rounded-2xl border-2 border-warm/40 bg-gradient-to-br from-amber-soft to-cream-soft hover:border-amber-warm transition cursor-pointer"
+              onClick={() => navigate('/calendar')}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-9 h-9 bg-white rounded-xl flex flex-col items-center justify-center text-amber-warm shadow-warm-sm">
+                  <span className="text-[8px] font-bold uppercase leading-none">
+                    {new Date(event.start_date).toLocaleDateString('id-ID', { month: 'short' })}
+                  </span>
+                  <span className="text-sm font-extrabold leading-none">
+                    {new Date(event.start_date).getDate()}
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-amber-warm uppercase tracking-wide">{event.type}</span>
+              </div>
+              <p className="font-bold text-navy text-sm leading-snug line-clamp-2">{event.title}</p>
             </div>
           ))}
           {(!stats?.upcoming_events || stats.upcoming_events.length === 0) && (
-            <p className="text-gray-400 py-4">Tidak ada agenda mendatang</p>
+            <div className="w-full text-center py-8">
+              <Calendar className="w-10 h-10 text-navy/20 mx-auto mb-2" />
+              <p className="text-navy/50 text-sm font-semibold">Tidak ada agenda mendatang</p>
+            </div>
           )}
         </div>
       </div>

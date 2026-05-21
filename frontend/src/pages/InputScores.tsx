@@ -112,11 +112,11 @@ export default function InputScores() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <ClipboardEdit className="w-6 h-6 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-navy flex items-center gap-2">
+            <ClipboardEdit className="w-6 h-6 text-amber-warm" />
             Input Nilai
           </h1>
-          <p className="text-gray-500">Input nilai per komponen untuk setiap siswa</p>
+          <p className="text-navy/60">Input nilai per komponen untuk setiap siswa</p>
         </div>
         {students.length > 0 && (
           <button onClick={handleSave} disabled={saving}
@@ -128,23 +128,23 @@ export default function InputScores() {
 
       {/* Filters */}
       <div className="bg-white rounded-2xl border p-4">
-        <div className="flex items-center gap-2 mb-3 text-gray-600">
+        <div className="flex items-center gap-2 mb-3 text-navy/70">
           <Filter className="w-4 h-4" />
           <span className="text-sm font-medium">Filter</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <select value={classId} onChange={e => setClassId(Number(e.target.value))}
-            className="px-4 py-2 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none">
+            className="px-4 py-2 rounded-xl border focus:ring-2 focus:ring-amber-warm/40 outline-none">
             <option value={0}>Pilih Kelas...</option>
             {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
           <select value={subjectId} onChange={e => setSubjectId(Number(e.target.value))}
-            className="px-4 py-2 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none">
+            className="px-4 py-2 rounded-xl border focus:ring-2 focus:ring-amber-warm/40 outline-none">
             <option value={0}>Pilih Mapel...</option>
             {subjects.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
           <select value={semesterId} onChange={e => setSemesterId(Number(e.target.value))}
-            className="px-4 py-2 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none">
+            className="px-4 py-2 rounded-xl border focus:ring-2 focus:ring-amber-warm/40 outline-none">
             <option value={0}>Pilih Semester...</option>
             {semesters.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
@@ -153,44 +153,44 @@ export default function InputScores() {
 
       {/* Score Table */}
       {loading ? (
-        <div className="text-center py-12 text-gray-400">Memuat...</div>
+        <div className="text-center py-12 text-navy/40">Memuat...</div>
       ) : !classId || !subjectId || !semesterId ? (
-        <div className="text-center py-12 text-gray-400">Pilih kelas, mapel, dan semester untuk mulai input nilai</div>
+        <div className="text-center py-12 text-navy/40">Pilih kelas, mapel, dan semester untuk mulai input nilai</div>
       ) : components.length === 0 ? (
         <div className="bg-amber-50 rounded-2xl p-6 text-center text-amber-700">
           Belum ada komponen raport. Admin harus mengatur komponen di menu "Komponen Raport" terlebih dahulu.
         </div>
       ) : students.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">Tidak ada siswa di kelas ini</div>
+        <div className="text-center py-12 text-navy/40">Tidak ada siswa di kelas ini</div>
       ) : (
         <div className="bg-white rounded-2xl border overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="px-3 py-3 text-left font-medium text-gray-500 sticky left-0 bg-gray-50">No</th>
-                <th className="px-3 py-3 text-left font-medium text-gray-500 sticky left-8 bg-gray-50 min-w-[150px]">Siswa</th>
+              <tr className="bg-cream-soft border-b">
+                <th className="px-3 py-3 text-left font-medium text-navy/60 sticky left-0 bg-cream-soft">No</th>
+                <th className="px-3 py-3 text-left font-medium text-navy/60 sticky left-8 bg-cream-soft min-w-[150px]">Siswa</th>
                 {manualComponents.map(c => (
-                  <th key={c.id} className="px-3 py-3 text-center font-medium text-gray-500 min-w-[100px]">
+                  <th key={c.id} className="px-3 py-3 text-center font-medium text-navy/60 min-w-[100px]">
                     <div>{c.name}</div>
-                    <div className="text-xs text-gray-400 font-normal">{c.weight}%</div>
+                    <div className="text-xs text-navy/40 font-normal">{c.weight}%</div>
                   </th>
                 ))}
                 {examComponents.map(c => (
-                  <th key={c.id} className="px-3 py-3 text-center font-medium text-blue-500 min-w-[100px]">
+                  <th key={c.id} className="px-3 py-3 text-center font-medium text-sky-warm min-w-[100px]">
                     <div>{c.name}</div>
                     <div className="text-xs text-blue-400 font-normal">{c.weight}% (auto)</div>
                   </th>
                 ))}
-                <th className="px-3 py-3 text-center font-medium text-gray-900 min-w-[80px]">Final</th>
+                <th className="px-3 py-3 text-center font-medium text-navy min-w-[80px]">Final</th>
               </tr>
             </thead>
             <tbody>
               {students.map((st, i) => (
-                <tr key={st.student_id} className="border-b last:border-0 hover:bg-gray-50">
-                  <td className="px-3 py-2 text-gray-400 sticky left-0 bg-white">{i + 1}</td>
+                <tr key={st.student_id} className="border-b last:border-0 hover:bg-cream-soft">
+                  <td className="px-3 py-2 text-navy/40 sticky left-0 bg-white">{i + 1}</td>
                   <td className="px-3 py-2 sticky left-8 bg-white">
-                    <div className="font-medium text-gray-900">{st.student_name}</div>
-                    <div className="text-xs text-gray-400">{st.nis}</div>
+                    <div className="font-medium text-navy">{st.student_name}</div>
+                    <div className="text-xs text-navy/40">{st.nis}</div>
                   </td>
                   {manualComponents.map(c => (
                     <td key={c.id} className="px-2 py-2 text-center">
@@ -198,22 +198,22 @@ export default function InputScores() {
                         type="number" min={0} max={100}
                         value={st.scores[c.id] || ''}
                         onChange={e => updateScore(i, c.id, Number(e.target.value))}
-                        className="w-16 px-2 py-1 text-center rounded-lg border focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-16 px-2 py-1 text-center rounded-lg border focus:ring-2 focus:ring-amber-warm/40 outline-none"
                       />
                     </td>
                   ))}
                   {examComponents.map(c => (
                     <td key={c.id} className="px-2 py-2 text-center">
-                      <span className="text-blue-600 font-medium">
+                      <span className="text-sky-warm font-medium">
                         {st.scores[c.id] ? Math.round(st.scores[c.id]) : '-'}
                       </span>
                     </td>
                   ))}
                   <td className="px-3 py-2 text-center">
                     <span className={`inline-flex px-2 py-1 rounded-full text-sm font-bold ${
-                      st.final_score >= 80 ? 'bg-green-100 text-green-700' :
-                      st.final_score >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                      st.final_score > 0 ? 'bg-red-100 text-red-700' : 'text-gray-400'
+                      st.final_score >= 80 ? 'bg-mint/15 text-mint' :
+                      st.final_score >= 60 ? 'bg-amber-warm/15 text-amber-warm' :
+                      st.final_score > 0 ? 'bg-rose/15 text-rose' : 'text-navy/40'
                     }`}>
                       {st.final_score > 0 ? st.final_score : '-'}
                     </span>

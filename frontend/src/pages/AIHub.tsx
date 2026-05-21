@@ -268,8 +268,8 @@ export default function AIHub() {
           <Sparkles className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">AI Hub</h1>
-          <p className="text-gray-500">Fitur kecerdasan buatan untuk membantu guru</p>
+          <h1 className="text-2xl font-bold text-navy">AI Hub</h1>
+          <p className="text-navy/60">Fitur kecerdasan buatan untuk membantu guru</p>
         </div>
       </div>
 
@@ -279,11 +279,11 @@ export default function AIHub() {
           <button
             key={f.id}
             onClick={() => { setActiveFeature(f.id); setResult(null) }}
-            className={`p-4 rounded-2xl text-left transition ${activeFeature === f.id ? 'bg-gradient-to-br ' + f.color + ' text-white shadow-lg' : 'bg-white border border-gray-200 hover:border-indigo-300'}`}
+            className={`p-4 rounded-2xl text-left transition ${activeFeature === f.id ? 'bg-gradient-to-br ' + f.color + ' text-white shadow-lg' : 'bg-white border border-warm/60 hover:border-indigo-300'}`}
           >
-            <f.icon className={`w-6 h-6 mb-2 ${activeFeature === f.id ? 'text-white' : 'text-gray-600'}`} />
+            <f.icon className={`w-6 h-6 mb-2 ${activeFeature === f.id ? 'text-white' : 'text-navy/70'}`} />
             <div className="font-semibold text-sm">{f.label}</div>
-            <div className={`text-xs mt-1 ${activeFeature === f.id ? 'text-white/80' : 'text-gray-500'}`}>{f.desc}</div>
+            <div className={`text-xs mt-1 ${activeFeature === f.id ? 'text-white/80' : 'text-navy/60'}`}>{f.desc}</div>
           </button>
         ))}
       </div>
@@ -292,22 +292,22 @@ export default function AIHub() {
       {activeFeature === 'config' && isAdmin && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Form */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-warm/40 p-6 space-y-4">
             <h3 className="font-bold text-lg">{editingId ? 'Edit' : 'Tambah'} Konfigurasi AI</h3>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nama (label)</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Nama (label)</label>
               <input value={cForm.name} onChange={e => setCForm({ ...cForm, name: e.target.value })}
                 placeholder="contoh: OpenRouter utama"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Provider (preset)</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Provider (preset)</label>
               <select onChange={e => {
                 const p = PROVIDER_PRESETS[Number(e.target.value)]
                 if (p) setCForm({ ...cForm, base_url: p.base_url, auth_type: p.auth_type, name: cForm.name || p.label, model: p.auth_type === 'chatgpt_session' ? 'auto' : cForm.model })
-              }} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+              }} className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                 <option value="">Pilih preset...</option>
                 {PROVIDER_PRESETS.map((p, i) => <option key={i} value={i}>{p.label}</option>)}
               </select>
@@ -333,24 +333,24 @@ export default function AIHub() {
                 </button>
 
                 <div className="relative flex items-center py-2">
-                  <div className="flex-grow border-t border-gray-200"></div>
-                  <span className="flex-shrink mx-3 text-xs text-gray-400">atau paste manual</span>
-                  <div className="flex-grow border-t border-gray-200"></div>
+                  <div className="flex-grow border-t border-warm/60"></div>
+                  <span className="flex-shrink mx-3 text-xs text-navy/40">atau paste manual</span>
+                  <div className="flex-grow border-t border-warm/60"></div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Access Token (manual)</label>
+                  <label className="block text-sm font-medium text-navy/80 mb-1">Access Token (manual)</label>
                   <textarea value={cForm.session_token} onChange={e => setCForm({ ...cForm, session_token: e.target.value })}
                     placeholder="eyJhbGciOiJSUzI1NiI..."
                     rows={3}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-xs" />
-                  <p className="text-xs text-gray-400 mt-1">Buka <code>https://chatgpt.com/api/auth/session</code> → copy accessToken</p>
+                    className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none font-mono text-xs" />
+                  <p className="text-xs text-navy/40 mt-1">Buka <code>https://chatgpt.com/api/auth/session</code> → copy accessToken</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                  <label className="block text-sm font-medium text-navy/80 mb-1">Model</label>
                   <select value={cForm.model} onChange={e => setCForm({ ...cForm, model: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                     <option value="auto">Auto (default)</option>
                     <option value="gpt-4o">GPT-4o</option>
                     <option value="gpt-4o-mini">GPT-4o Mini</option>
@@ -361,41 +361,41 @@ export default function AIHub() {
             ) : (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Base URL</label>
+                  <label className="block text-sm font-medium text-navy/80 mb-1">Base URL</label>
                   <input value={cForm.base_url} onChange={e => setCForm({ ...cForm, base_url: e.target.value })}
                     placeholder="https://api.openai.com/v1"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm" />
+                    className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none font-mono text-sm" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                  <label className="block text-sm font-medium text-navy/80 mb-1">API Key</label>
                   <input type="password" value={cForm.api_key} onChange={e => setCForm({ ...cForm, api_key: e.target.value })}
                     placeholder="sk-..."
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm" />
+                    className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none font-mono text-sm" />
                 </div>
 
                 <button onClick={handleFetchModels} disabled={fetchingModels || !cForm.base_url}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-indigo-300 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50">
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-indigo-300 text-amber-warm hover:bg-amber-soft/40 disabled:opacity-50">
                   {fetchingModels ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                   Ambil Daftar Model
                 </button>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Model Aktif {availableModels.length > 0 && <span className="text-xs text-green-600">({availableModels.length} tersedia)</span>}
+                  <label className="block text-sm font-medium text-navy/80 mb-1">
+                    Model Aktif {availableModels.length > 0 && <span className="text-xs text-mint">({availableModels.length} tersedia)</span>}
                   </label>
                   {availableModels.length > 0 ? (
                     <select value={cForm.model} onChange={e => setCForm({ ...cForm, model: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                       <option value="">Pilih model...</option>
                       {availableModels.map(m => <option key={m} value={m}>{m}</option>)}
                     </select>
                   ) : (
                     <input value={cForm.model} onChange={e => setCForm({ ...cForm, model: e.target.value })}
                       placeholder="gpt-4o-mini atau ketik manual"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm" />
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none font-mono text-sm" />
                   )}
-                  <p className="text-xs text-gray-400 mt-1">Klik "Ambil Daftar Model" untuk auto-populate. Boleh juga ketik manual.</p>
+                  <p className="text-xs text-navy/40 mt-1">Klik "Ambil Daftar Model" untuk auto-populate. Boleh juga ketik manual.</p>
                 </div>
               </>
             )}
@@ -403,36 +403,36 @@ export default function AIHub() {
             <div className="flex gap-3">
               {editingId && (
                 <button onClick={() => { setCForm({ id: 0, name: '', auth_type: 'apikey', base_url: '', api_key: '', session_token: '', model: '', active: false }); setEditingId(null); setAvailableModels([]) }}
-                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50">Batal</button>
+                  className="flex-1 py-2.5 rounded-xl border border-warm/60 text-navy/70 hover:bg-cream-soft">Batal</button>
               )}
-              <button onClick={handleSaveConfig} className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
+              <button onClick={handleSaveConfig} className="flex-1 py-2.5 rounded-xl gradient-warm text-white hover:shadow-warm">
                 {editingId ? 'Update' : 'Simpan'}
               </button>
             </div>
           </div>
 
           {/* List */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-3">
+          <div className="bg-white rounded-2xl shadow-sm border border-warm/40 p-6 space-y-3">
             <h3 className="font-bold text-lg">Konfigurasi Tersimpan</h3>
             {configs.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-sm">Belum ada konfigurasi. Tambahkan di form sebelah.</div>
+              <div className="text-center py-8 text-navy/40 text-sm">Belum ada konfigurasi. Tambahkan di form sebelah.</div>
             ) : configs.map(c => (
-              <div key={c.id} className={`rounded-xl border p-4 space-y-2 ${c.active ? 'border-green-300 bg-green-50' : 'border-gray-200'}`}>
+              <div key={c.id} className={`rounded-xl border p-4 space-y-2 ${c.active ? 'border-green-300 bg-mint/10' : 'border-warm/60'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold">{c.name}</span>
-                    {c.auth_type === 'chatgpt_session' && <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Session</span>}
+                    {c.auth_type === 'chatgpt_session' && <span className="text-xs bg-coral/15 text-coral px-2 py-0.5 rounded-full">Session</span>}
                     {c.active && <span className="inline-flex items-center gap-1 text-xs bg-green-600 text-white px-2 py-0.5 rounded-full"><CheckCircle2 className="w-3 h-3" /> Aktif</span>}
                   </div>
                 </div>
-                <div className="text-xs text-gray-500 font-mono truncate">{c.auth_type === 'chatgpt_session' ? 'chatgpt.com (free session)' : c.base_url}</div>
-                <div className="text-xs text-gray-700">Model: <span className="font-mono">{c.model}</span></div>
+                <div className="text-xs text-navy/60 font-mono truncate">{c.auth_type === 'chatgpt_session' ? 'chatgpt.com (free session)' : c.base_url}</div>
+                <div className="text-xs text-navy/80">Model: <span className="font-mono">{c.model}</span></div>
                 <div className="flex gap-2 pt-2">
                   {!c.active && (
                     <button onClick={() => handleActivate(c.id)} className="flex-1 px-3 py-1.5 text-xs rounded-lg bg-green-600 text-white hover:bg-green-700">Aktifkan</button>
                   )}
-                  <button onClick={() => handleEditConfig(c)} className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-indigo-300 text-indigo-600 hover:bg-indigo-50">Edit</button>
-                  <button onClick={() => handleDeleteConfig(c.id)} className="px-3 py-1.5 text-xs rounded-lg border border-red-300 text-red-600 hover:bg-red-50"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => handleEditConfig(c)} className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-indigo-300 text-amber-warm hover:bg-amber-soft/40">Edit</button>
+                  <button onClick={() => handleDeleteConfig(c.id)} className="px-3 py-1.5 text-xs rounded-lg border border-rose/40 text-rose hover:bg-rose/10"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
             ))}
@@ -443,33 +443,33 @@ export default function AIHub() {
       {/* ── Generator Forms ── */}
       {activeFeature !== 'config' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-warm/40 p-6 space-y-4">
             <h3 className="font-bold text-lg">Form</h3>
 
             {activeFeature === 'questions' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Topik</label>
+                  <label className="block text-sm font-medium text-navy/80 mb-1">Topik</label>
                   <input value={qForm.topic} onChange={e => setQForm({ ...qForm, topic: e.target.value })} placeholder="contoh: Trigonometri dasar"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                    className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Mapel</label>
+                    <label className="block text-sm font-medium text-navy/80 mb-1">Mapel</label>
                     <select value={qForm.subject_id} onChange={e => {
                       const sid = e.target.value
                       const sub = subjects.find(s => String(s.id) === sid)
                       setQForm({ ...qForm, subject_id: sid, subject: sub?.name || '', level: sub?.level || '' })
                     }}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                       <option value="">Pilih mapel...</option>
                       {subjects.map(s => <option key={s.id} value={s.id}>{s.name} {s.level ? `(${s.level})` : ''}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Simpan ke Bank</label>
+                    <label className="block text-sm font-medium text-navy/80 mb-1">Simpan ke Bank</label>
                     <select value={qForm.bank_id} onChange={e => setQForm({ ...qForm, bank_id: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                       <option value="">Tanpa bank (draft)</option>
                       {banks.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
                     </select>
@@ -477,23 +477,23 @@ export default function AIHub() {
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
+                    <label className="block text-sm font-medium text-navy/80 mb-1">Jumlah</label>
                     <input type="number" value={qForm.count} onChange={e => setQForm({ ...qForm, count: Number(e.target.value) })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                    <label className="block text-sm font-medium text-navy/80 mb-1">Tipe</label>
                     <select value={qForm.type} onChange={e => setQForm({ ...qForm, type: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                       <option value="pilihan_ganda">PG</option>
                       <option value="essay">Esai</option>
                       <option value="true_false">B/S</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tingkat</label>
+                    <label className="block text-sm font-medium text-navy/80 mb-1">Tingkat</label>
                     <select value={qForm.difficulty} onChange={e => setQForm({ ...qForm, difficulty: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                       <option value="mudah">Mudah</option>
                       <option value="sedang">Sedang</option>
                       <option value="sulit">Sulit</option>
@@ -501,7 +501,7 @@ export default function AIHub() {
                   </div>
                 </div>
                 {qForm.bank_id && (
-                  <div className="text-xs text-green-700 bg-green-50 rounded-lg p-2.5">
+                  <div className="text-xs text-mint bg-mint/10 rounded-lg p-2.5">
                     ✓ Soal akan otomatis masuk ke bank: <b>{banks.find(b => b.id === Number(qForm.bank_id))?.title}</b>
                   </div>
                 )}
@@ -510,9 +510,9 @@ export default function AIHub() {
 
             {activeFeature === 'essay' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ID Attempt Ujian</label>
+                <label className="block text-sm font-medium text-navy/80 mb-1">ID Attempt Ujian</label>
                 <input value={eForm.exam_attempt_id} onChange={e => setEForm({ exam_attempt_id: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                  className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
               </div>
             )}
 
@@ -520,9 +520,9 @@ export default function AIHub() {
               <>
                 {['subject', 'class', 'topic', 'kurikulum', 'duration'].map(k => (
                   <div key={k}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">{k}</label>
+                    <label className="block text-sm font-medium text-navy/80 mb-1 capitalize">{k}</label>
                     <input value={(rForm as any)[k]} onChange={e => setRForm({ ...rForm, [k]: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
                   </div>
                 ))}
               </>
@@ -532,80 +532,80 @@ export default function AIHub() {
               <>
                 {['subject', 'class', 'kurikulum', 'tahun'].map(k => (
                   <div key={k}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">{k}</label>
+                    <label className="block text-sm font-medium text-navy/80 mb-1 capitalize">{k}</label>
                     <input value={(pForm as any)[k]} onChange={e => setPForm({ ...pForm, [k]: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                      className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
                   </div>
                 ))}
               </>
             )}
 
             <button onClick={handleSubmit} disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 font-medium">
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl gradient-warm text-white hover:shadow-warm disabled:opacity-50 font-medium">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               Generate
             </button>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-3">
+          <div className="bg-white rounded-2xl shadow-sm border border-warm/40 p-6 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-lg">Hasil</h3>
               {(result || generatedQuestions.length > 0) && (
-                <button onClick={copyResult} className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700">
+                <button onClick={copyResult} className="flex items-center gap-1 text-sm text-amber-warm hover:text-amber-warm">
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   {copied ? 'Tersalin' : 'Salin'}
                 </button>
               )}
             </div>
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-400 w-full">
+              <div className="flex flex-col items-center justify-center py-12 text-navy/40 w-full">
                 <Loader2 className="w-8 h-8 animate-spin mb-3" />
-                <p className="text-sm text-gray-600 mb-3 text-center px-4">{jobMessage || 'AI sedang memproses...'}</p>
+                <p className="text-sm text-navy/70 mb-3 text-center px-4">{jobMessage || 'AI sedang memproses...'}</p>
                 {activeFeature === 'questions' && jobId !== null && (
                   <div className="w-full max-w-xs px-4">
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-indigo-500 transition-all duration-500" style={{ width: `${jobProgress}%` }} />
+                    <div className="h-2 bg-amber-soft/40 rounded-full overflow-hidden">
+                      <div className="h-full bg-amber-warm transition-all duration-500" style={{ width: `${jobProgress}%` }} />
                     </div>
-                    <div className="text-xs text-gray-400 mt-1 text-center">{jobProgress}% • Job #{jobId}</div>
+                    <div className="text-xs text-navy/40 mt-1 text-center">{jobProgress}% • Job #{jobId}</div>
                   </div>
                 )}
               </div>
             ) : generatedQuestions.length > 0 ? (
               <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
-                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-700 flex items-center gap-2">
+                <div className="bg-mint/10 border border-green-200 rounded-xl p-3 text-sm text-mint flex items-center gap-2">
                   <Check className="w-4 h-4" /> {result}
                   {qForm.bank_id && <span className="ml-auto text-xs">Tersimpan di bank</span>}
                 </div>
                 {generatedQuestions.map((q, i) => {
                   const opts = parseOptions(q.options)
                   return (
-                    <div key={i} className="border border-gray-200 rounded-xl p-4 space-y-2">
+                    <div key={i} className="border border-warm/60 rounded-xl p-4 space-y-2">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="text-sm font-semibold text-gray-900">Soal {i + 1}</div>
+                        <div className="text-sm font-semibold text-navy">Soal {i + 1}</div>
                         <div className="flex gap-1 text-xs">
-                          <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">{q.type}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-amber-soft/40 text-amber-warm">{q.type}</span>
                           <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">{q.points || 10} pt</span>
                         </div>
                       </div>
-                      <div className="text-sm text-gray-800 whitespace-pre-wrap">{q.content}</div>
+                      <div className="text-sm text-navy whitespace-pre-wrap">{q.content}</div>
                       {opts.length > 0 && (
                         <div className="space-y-1 pt-1">
                           {opts.map((o: any, j: number) => (
-                            <div key={j} className={`text-sm px-3 py-1.5 rounded-lg flex items-start gap-2 ${q.answer === o.key ? 'bg-green-50 text-green-800 font-medium' : 'bg-gray-50 text-gray-700'}`}>
+                            <div key={j} className={`text-sm px-3 py-1.5 rounded-lg flex items-start gap-2 ${q.answer === o.key ? 'bg-mint/10 text-mint font-medium' : 'bg-cream-soft text-navy/80'}`}>
                               <span className="font-semibold">{o.key}.</span>
                               <span>{o.text}</span>
-                              {q.answer === o.key && <Check className="w-4 h-4 ml-auto text-green-600 shrink-0" />}
+                              {q.answer === o.key && <Check className="w-4 h-4 ml-auto text-mint shrink-0" />}
                             </div>
                           ))}
                         </div>
                       )}
                       {opts.length === 0 && q.answer && (
-                        <div className="text-sm bg-green-50 text-green-800 rounded-lg px-3 py-2">
+                        <div className="text-sm bg-mint/10 text-mint rounded-lg px-3 py-2">
                           <span className="font-semibold">Kunci: </span>{q.answer}
                         </div>
                       )}
                       {q.explanation && (
-                        <div className="text-xs text-gray-500 border-t pt-2 mt-2">
+                        <div className="text-xs text-navy/60 border-t pt-2 mt-2">
                           <b>Pembahasan:</b> {q.explanation}
                         </div>
                       )}
@@ -614,9 +614,9 @@ export default function AIHub() {
                 })}
               </div>
             ) : result ? (
-              <pre className="text-xs bg-gray-50 rounded-xl p-4 whitespace-pre-wrap max-h-[600px] overflow-y-auto font-mono">{result}</pre>
+              <pre className="text-xs bg-cream-soft rounded-xl p-4 whitespace-pre-wrap max-h-[600px] overflow-y-auto font-mono">{result}</pre>
             ) : (
-              <div className="text-center py-12 text-gray-400 text-sm">Hasil akan muncul di sini</div>
+              <div className="text-center py-12 text-navy/40 text-sm">Hasil akan muncul di sini</div>
             )}
           </div>
         </div>

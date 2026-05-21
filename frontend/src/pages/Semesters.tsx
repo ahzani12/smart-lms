@@ -102,13 +102,13 @@ export default function Semesters() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <CalendarClock className="w-6 h-6 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-navy flex items-center gap-2">
+            <CalendarClock className="w-6 h-6 text-amber-warm" />
             Semester & Tahun Pelajaran
           </h1>
-          <p className="text-gray-500">Kelola semester dan tahun pelajaran</p>
+          <p className="text-navy/60">Kelola semester dan tahun pelajaran</p>
         </div>
-        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">
+        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 gradient-warm text-white rounded-xl hover:bg-amber-warm">
           <Plus className="w-4 h-4" /> Tambah Semester
         </button>
       </div>
@@ -116,17 +116,17 @@ export default function Semesters() {
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {semesters.map(s => (
-          <div key={s.id} className={`bg-white rounded-2xl border p-5 ${s.active ? 'ring-2 ring-indigo-500 border-indigo-200' : ''}`}>
+          <div key={s.id} className={`bg-white rounded-2xl border p-5 ${s.active ? 'ring-2 ring-amber-warm/40 border-warm' : ''}`}>
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-bold text-gray-900">{s.name}</h3>
-                <p className="text-sm text-gray-500">TP {s.year}</p>
+                <h3 className="font-bold text-navy">{s.name}</h3>
+                <p className="text-sm text-navy/60">TP {s.year}</p>
               </div>
               {s.active && (
-                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">Aktif</span>
+                <span className="px-2 py-0.5 bg-mint/15 text-mint rounded-full text-xs font-medium">Aktif</span>
               )}
             </div>
-            <div className="mt-3 text-sm text-gray-600 space-y-1">
+            <div className="mt-3 text-sm text-navy/70 space-y-1">
               <div>Periode: <span className="font-medium capitalize">{s.period}</span></div>
               <div>Mulai: {s.start_date ? new Date(s.start_date).toLocaleDateString('id-ID') : '-'}</div>
               <div>Selesai: {s.end_date ? new Date(s.end_date).toLocaleDateString('id-ID') : '-'}</div>
@@ -134,21 +134,21 @@ export default function Semesters() {
             <div className="mt-4 flex gap-2">
               {!s.active && (
                 <button onClick={() => handleSetActive(s)}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-50 text-green-700 rounded-lg hover:bg-green-100">
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-mint/10 text-mint rounded-lg hover:bg-green-100">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Aktifkan
                 </button>
               )}
-              <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-indigo-50 text-indigo-600">
+              <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-amber-soft/40 text-amber-warm">
                 <Edit2 className="w-4 h-4" />
               </button>
-              <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600">
+              <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-rose/10 text-rose">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
         ))}
         {semesters.length === 0 && (
-          <div className="col-span-full text-center py-12 text-gray-400">Belum ada semester. Tambah dulu.</div>
+          <div className="col-span-full text-center py-12 text-navy/40">Belum ada semester. Tambah dulu.</div>
         )}
       </div>
 
@@ -158,44 +158,44 @@ export default function Semesters() {
           <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold">{editItem ? 'Edit' : 'Tambah'} Semester</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-amber-soft/40 rounded-lg"><X className="w-5 h-5" /></button>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tahun Pelajaran</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Tahun Pelajaran</label>
               <input type="text" value={form.year} onChange={e => setForm({ ...form, year: e.target.value })}
                 placeholder="2025/2026"
-                className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none" />
+                className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-warm/40 outline-none" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Periode</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Periode</label>
               <select value={form.period} onChange={e => setForm({ ...form, period: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none">
+                className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-warm/40 outline-none">
                 <option value="ganjil">Ganjil</option>
                 <option value="genap">Genap</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Tanggal Mulai</label>
               <input type="date" value={form.start_date} onChange={e => setForm({ ...form, start_date: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none" />
+                className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-warm/40 outline-none" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Selesai</label>
+              <label className="block text-sm font-medium text-navy/80 mb-1">Tanggal Selesai</label>
               <input type="date" value={form.end_date} onChange={e => setForm({ ...form, end_date: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none" />
+                className="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-warm/40 outline-none" />
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-600">
+            <div className="bg-cream-soft rounded-xl p-3 text-sm text-navy/70">
               Nama otomatis: <span className="font-medium">{updateName(form.year || '...', form.period)}</span>
             </div>
 
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50">Batal</button>
-              <button onClick={handleSave} className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Simpan</button>
+              <button onClick={() => setShowModal(false)} className="flex-1 py-2.5 rounded-xl border border-warm/60 text-navy/70 hover:bg-cream-soft">Batal</button>
+              <button onClick={handleSave} className="flex-1 py-2.5 rounded-xl gradient-warm text-white hover:shadow-warm">Simpan</button>
             </div>
           </div>
         </div>

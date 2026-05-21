@@ -93,15 +93,15 @@ export default function SuperAdmins() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <Shield className="w-7 h-7 text-indigo-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Kelola Admin</h1>
+          <Shield className="w-7 h-7 text-amber-warm" />
+          <h1 className="text-2xl font-bold text-navy">Kelola Admin</h1>
         </div>
         <div className="flex items-center gap-3">
-          <select value={filterSchool} onChange={e => setFilterSchool(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 text-sm">
+          <select value={filterSchool} onChange={e => setFilterSchool(e.target.value)} className="px-3 py-2 rounded-xl border border-warm/60 text-sm">
             <option value="">Semua Sekolah</option>
             {schools.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
-          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
+          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 rounded-xl gradient-warm text-white hover:shadow-warm">
             <Plus className="w-4 h-4" /> Tambah Admin
           </button>
         </div>
@@ -111,7 +111,7 @@ export default function SuperAdmins() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50 text-left text-gray-500">
+              <tr className="border-b bg-cream-soft text-left text-navy/60">
                 <th className="px-4 py-3 font-medium">Nama</th>
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Role</th>
@@ -122,31 +122,31 @@ export default function SuperAdmins() {
             </thead>
             <tbody>
               {admins.map(a => (
-                <tr key={a.id} className="border-b last:border-0 hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{a.name}</td>
-                  <td className="px-4 py-3 text-gray-600">{a.email}</td>
+                <tr key={a.id} className="border-b last:border-0 hover:bg-cream-soft">
+                  <td className="px-4 py-3 font-medium text-navy">{a.name}</td>
+                  <td className="px-4 py-3 text-navy/70">{a.email}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.role === 'admin_pusat' ? 'bg-indigo-50 text-indigo-600' : 'bg-orange-50 text-orange-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.role === 'admin_pusat' ? 'bg-amber-soft/40 text-amber-warm' : 'bg-orange-50 text-orange-600'}`}>
                       {a.role === 'admin_pusat' ? 'Admin Pusat' : 'Admin Cabang'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{a.school?.name || '-'}</td>
+                  <td className="px-4 py-3 text-navy/70">{a.school?.name || '-'}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.active ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.active ? 'bg-mint/10 text-mint' : 'bg-rose/10 text-rose'}`}>
                       {a.active ? 'Aktif' : 'Nonaktif'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-1">
-                      <button onClick={() => openEdit(a)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500" title="Edit"><Pencil className="w-4 h-4" /></button>
-                      <button onClick={() => { setResetId(a.id); setNewPass('') }} className="p-1.5 rounded-lg hover:bg-yellow-50 text-yellow-600" title="Reset Password"><Key className="w-4 h-4" /></button>
-                      <button onClick={() => handleDelete(a)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" title="Hapus"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => openEdit(a)} className="p-1.5 rounded-lg hover:bg-amber-soft/40 text-navy/60" title="Edit"><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => { setResetId(a.id); setNewPass('') }} className="p-1.5 rounded-lg hover:bg-amber-soft/40 text-amber-warm" title="Reset Password"><Key className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(a)} className="p-1.5 rounded-lg hover:bg-rose/10 text-rose" title="Hapus"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
               ))}
               {admins.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Belum ada admin</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-navy/40">Belum ada admin</td></tr>
               )}
             </tbody>
           </table>
@@ -159,29 +159,29 @@ export default function SuperAdmins() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold">{editing ? 'Edit Admin' : 'Tambah Admin'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-amber-soft/40"><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-3">
-              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
-              <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="Email" type="email" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama" className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
+              <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="Email" type="email" className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
               {!editing && (
-                <input value={form.password} onChange={e => setForm({...form, password: e.target.value})} placeholder="Password" type="password" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                <input value={form.password} onChange={e => setForm({...form, password: e.target.value})} placeholder="Password" type="password" className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
               )}
-              <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="Telepon" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="Telepon" className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
               <div className="grid grid-cols-2 gap-3">
-                <select value={form.role} onChange={e => setForm({...form, role: e.target.value})} className="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <select value={form.role} onChange={e => setForm({...form, role: e.target.value})} className="px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                   <option value="admin_pusat">Admin Pusat</option>
                   <option value="admin_cabang">Admin Cabang</option>
                 </select>
-                <select value={form.school_id} onChange={e => setForm({...form, school_id: Number(e.target.value)})} className="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <select value={form.school_id} onChange={e => setForm({...form, school_id: Number(e.target.value)})} className="px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                   <option value={0}>Pilih Sekolah</option>
                   {schools.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">Batal</button>
-              <button onClick={handleSave} className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Simpan</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded-xl border border-warm/60 text-navy/80 hover:bg-cream-soft">Batal</button>
+              <button onClick={handleSave} className="px-4 py-2 rounded-xl gradient-warm text-white hover:shadow-warm">Simpan</button>
             </div>
           </div>
         </div>
@@ -192,9 +192,9 @@ export default function SuperAdmins() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
             <h2 className="text-lg font-bold">Reset Password</h2>
-            <input value={newPass} onChange={e => setNewPass(e.target.value)} placeholder="Password baru" type="password" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+            <input value={newPass} onChange={e => setNewPass(e.target.value)} placeholder="Password baru" type="password" className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setResetId(null)} className="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">Batal</button>
+              <button onClick={() => setResetId(null)} className="px-4 py-2 rounded-xl border border-warm/60 text-navy/80 hover:bg-cream-soft">Batal</button>
               <button onClick={handleResetPassword} className="px-4 py-2 rounded-xl bg-yellow-500 text-white hover:bg-yellow-600">Reset</button>
             </div>
           </div>

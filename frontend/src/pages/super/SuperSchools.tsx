@@ -65,10 +65,10 @@ export default function SuperSchools() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Building2 className="w-7 h-7 text-indigo-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Kelola Sekolah</h1>
+          <Building2 className="w-7 h-7 text-amber-warm" />
+          <h1 className="text-2xl font-bold text-navy">Kelola Sekolah</h1>
         </div>
-        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
+        <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 rounded-xl gradient-warm text-white hover:shadow-warm">
           <Plus className="w-4 h-4" /> Tambah Sekolah
         </button>
       </div>
@@ -77,7 +77,7 @@ export default function SuperSchools() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50 text-left text-gray-500">
+              <tr className="border-b bg-cream-soft text-left text-navy/60">
                 <th className="px-4 py-3 font-medium">Nama</th>
                 <th className="px-4 py-3 font-medium">Level</th>
                 <th className="px-4 py-3 font-medium">NPSN</th>
@@ -89,26 +89,26 @@ export default function SuperSchools() {
             </thead>
             <tbody>
               {schools.map(s => (
-                <tr key={s.id} className="border-b last:border-0 hover:bg-gray-50">
+                <tr key={s.id} className="border-b last:border-0 hover:bg-cream-soft">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">{s.name}</div>
-                    <div className="text-xs text-gray-500">{s.email}</div>
+                    <div className="font-medium text-navy">{s.name}</div>
+                    <div className="text-xs text-navy/60">{s.email}</div>
                   </td>
-                  <td className="px-4 py-3"><span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 text-xs font-medium">{s.level}</span></td>
-                  <td className="px-4 py-3 text-gray-600">{s.npsn}</td>
+                  <td className="px-4 py-3"><span className="px-2 py-0.5 rounded-full bg-amber-soft/40 text-amber-warm text-xs font-medium">{s.level}</span></td>
+                  <td className="px-4 py-3 text-navy/70">{s.npsn}</td>
                   <td className="px-4 py-3 text-center">{s.student_count}</td>
                   <td className="px-4 py-3 text-center">{s.teacher_count}</td>
                   <td className="px-4 py-3 text-center">{s.admin_count}</td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-1">
-                      <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"><Pencil className="w-4 h-4" /></button>
-                      <button onClick={() => handleDelete(s)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-amber-soft/40 text-navy/60"><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(s)} className="p-1.5 rounded-lg hover:bg-rose/10 text-rose"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
               ))}
               {schools.length === 0 && (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">Belum ada sekolah</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-navy/40">Belum ada sekolah</td></tr>
               )}
             </tbody>
           </table>
@@ -121,18 +121,18 @@ export default function SuperSchools() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold">{editing ? 'Edit Sekolah' : 'Tambah Sekolah'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-amber-soft/40"><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-3">
-              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama Sekolah" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
-              <input value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="Alamat" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama Sekolah" className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
+              <input value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="Alamat" className="w-full px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
               <div className="grid grid-cols-2 gap-3">
-                <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="Telepon" className="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
-                <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="Email" className="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="Telepon" className="px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
+                <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="Email" className="px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <input value={form.npsn} onChange={e => setForm({...form, npsn: e.target.value})} placeholder="NPSN" className="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" />
-                <select value={form.level} onChange={e => setForm({...form, level: e.target.value})} className="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input value={form.npsn} onChange={e => setForm({...form, npsn: e.target.value})} placeholder="NPSN" className="px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none" />
+                <select value={form.level} onChange={e => setForm({...form, level: e.target.value})} className="px-4 py-2.5 rounded-xl border border-warm/60 focus:ring-2 focus:ring-amber-warm/40 outline-none">
                   <option value="TK">TK</option>
                   <option value="RA">RA</option>
                   <option value="SD">SD</option>
@@ -146,8 +146,8 @@ export default function SuperSchools() {
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">Batal</button>
-              <button onClick={handleSave} className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Simpan</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded-xl border border-warm/60 text-navy/80 hover:bg-cream-soft">Batal</button>
+              <button onClick={handleSave} className="px-4 py-2 rounded-xl gradient-warm text-white hover:shadow-warm">Simpan</button>
             </div>
           </div>
         </div>

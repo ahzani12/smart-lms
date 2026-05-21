@@ -17,20 +17,20 @@ export default function SuperDashboard() {
     axios.get('/api/super/overview').then(r => setData(r.data))
   }, [])
 
-  if (!data) return <div className="p-6 text-center text-gray-500">Memuat...</div>
+  if (!data) return <div className="p-6 text-center text-navy/60">Memuat...</div>
 
   const cards = [
-    { label: 'Total Sekolah', value: data.total_schools, icon: Building2, color: 'bg-indigo-100 text-indigo-600' },
-    { label: 'Total Siswa', value: data.total_students, icon: GraduationCap, color: 'bg-green-100 text-green-600' },
-    { label: 'Total Guru', value: data.total_teachers, icon: Users, color: 'bg-blue-100 text-blue-600' },
-    { label: 'Total Ujian', value: data.total_exams, icon: FileText, color: 'bg-purple-100 text-purple-600' },
+    { label: 'Total Sekolah', value: data.total_schools, icon: Building2, color: 'bg-amber-soft text-amber-warm' },
+    { label: 'Total Siswa', value: data.total_students, icon: GraduationCap, color: 'bg-mint/15 text-mint' },
+    { label: 'Total Guru', value: data.total_teachers, icon: Users, color: 'bg-blue-100 text-sky-warm' },
+    { label: 'Total Ujian', value: data.total_exams, icon: FileText, color: 'bg-purple-100 text-coral' },
   ]
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <BarChart3 className="w-7 h-7 text-indigo-600" />
-        <h1 className="text-2xl font-bold text-gray-900">Superadmin Dashboard</h1>
+        <BarChart3 className="w-7 h-7 text-amber-warm" />
+        <h1 className="text-2xl font-bold text-navy">Superadmin Dashboard</h1>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -40,19 +40,19 @@ export default function SuperDashboard() {
               <c.icon className="w-6 h-6" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900">{c.value}</div>
-              <div className="text-sm text-gray-500">{c.label}</div>
+              <div className="text-2xl font-bold text-navy">{c.value}</div>
+              <div className="text-sm text-navy/60">{c.label}</div>
             </div>
           </div>
         ))}
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Statistik Per Sekolah</h2>
+        <h2 className="text-lg font-semibold text-navy mb-4">Statistik Per Sekolah</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500">
+              <tr className="border-b text-left text-navy/60">
                 <th className="pb-3 font-medium">Sekolah</th>
                 <th className="pb-3 font-medium text-center">Siswa</th>
                 <th className="pb-3 font-medium text-center">Guru</th>
@@ -61,13 +61,13 @@ export default function SuperDashboard() {
             <tbody>
               {data.school_stats?.map(s => (
                 <tr key={s.id} className="border-b last:border-0">
-                  <td className="py-3 font-medium text-gray-900">{s.name}</td>
+                  <td className="py-3 font-medium text-navy">{s.name}</td>
                   <td className="py-3 text-center">{s.students}</td>
                   <td className="py-3 text-center">{s.teachers}</td>
                 </tr>
               ))}
               {(!data.school_stats || data.school_stats.length === 0) && (
-                <tr><td colSpan={3} className="py-6 text-center text-gray-400">Belum ada sekolah</td></tr>
+                <tr><td colSpan={3} className="py-6 text-center text-navy/40">Belum ada sekolah</td></tr>
               )}
             </tbody>
           </table>

@@ -74,70 +74,78 @@ export default function Students() {
         extraActions={
           <button
             onClick={() => setShowImport(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition"
+            className="flex items-center gap-2 px-5 py-2.5 bg-mint text-white rounded-2xl hover:opacity-90 transition font-bold text-sm shadow-warm-sm"
           >
-            <Upload className="w-4 h-4" />
-            Import Siswa
+            <Upload className="w-4 h-4" strokeWidth={2.5} />
+            Import
           </button>
         }
       />
 
       {/* Import Modal */}
       {showImport && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">Import Siswa</h3>
-              <button onClick={() => setShowImport(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 bg-navy/60 backdrop-blur-sm flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
+          <div className="bg-cream w-full max-w-lg rounded-t-3xl lg:rounded-3xl shadow-card-lg max-h-[92vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-5 border-b border-warm/40 flex items-center justify-between bg-white">
+              <div>
+                <h3 className="text-lg font-extrabold text-navy">Import Siswa</h3>
+                <p className="text-xs text-navy/60 mt-0.5">Tambah banyak siswa sekaligus</p>
+              </div>
+              <button
+                onClick={() => setShowImport(false)}
+                className="p-2 rounded-xl hover:bg-amber-soft text-navy/60 hover:text-navy transition"
+              >
+                <X className="w-5 h-5" strokeWidth={2.4} />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="px-6 py-5 space-y-4 overflow-y-auto">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kelas (opsional)</label>
+                <label className="block text-xs font-extrabold text-navy uppercase tracking-wide mb-1.5">
+                  Kelas (opsional)
+                </label>
                 <select
                   value={importClassId}
                   onChange={e => setImportClassId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-4 py-3 rounded-2xl bg-white border-2 border-warm/60 focus:ring-4 focus:ring-amber-warm/15 focus:border-amber-warm outline-none transition text-sm font-semibold text-navy"
                 >
-                  <option value="">-- Pilih Kelas --</option>
+                  <option value="">— Pilih Kelas —</option>
                   {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Data Siswa (satu nama per baris, atau JSON)
+                <label className="block text-xs font-extrabold text-navy uppercase tracking-wide mb-1.5">
+                  Data Siswa
                 </label>
                 <textarea
                   value={importText}
                   onChange={e => setImportText(e.target.value)}
                   rows={8}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
-                  placeholder={'Ahmad Rizki\nDewi Lestari\nBudi Santoso\n\natau JSON:\n[{"name":"Ahmad","nis":"001","nisn":"0012345678","gender":"L"}]'}
+                  className="w-full px-4 py-3 rounded-2xl bg-white border-2 border-warm/60 focus:ring-4 focus:ring-amber-warm/15 focus:border-amber-warm outline-none transition font-mono text-sm resize-none"
+                  placeholder={'Satu nama per baris:\nAhmad Rizki\nDewi Lestari\nBudi Santoso\n\nAtau JSON:\n[{"name":"Ahmad","nis":"001","gender":"L"}]'}
                 />
               </div>
 
-              <p className="text-xs text-gray-500">
-                Setiap siswa akan mendapat ID Siswa 6 digit otomatis dan password default: siswa123
-              </p>
-
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowImport(false)}
-                  className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={handleImport}
-                  disabled={importing}
-                  className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition disabled:opacity-50"
-                >
-                  {importing ? 'Mengimport...' : 'Import'}
-                </button>
+              <div className="bg-amber-soft/50 border border-warm rounded-2xl p-3 text-xs text-navy/70 leading-relaxed">
+                <span className="font-bold text-navy">Catatan:</span> Setiap siswa otomatis dapat ID 6 digit dan password default <code className="bg-white px-1.5 py-0.5 rounded font-mono text-amber-warm">siswa123</code>.
               </div>
+            </div>
+
+            <div className="px-6 py-4 bg-white border-t border-warm/40 flex gap-3 safe-bottom">
+              <button
+                onClick={() => setShowImport(false)}
+                className="flex-1 py-3 rounded-2xl border-2 border-warm/60 text-navy font-bold text-sm hover:bg-amber-soft/40 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleImport}
+                disabled={importing}
+                className="flex-1 py-3 rounded-2xl bg-mint text-white font-bold text-sm hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {importing ? 'Mengimport...' : (<><Upload className="w-4 h-4" strokeWidth={2.5} /> Import</>)}
+              </button>
             </div>
           </div>
         </div>

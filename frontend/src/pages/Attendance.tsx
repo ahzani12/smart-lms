@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { Calendar, Clock, QrCode, CheckCircle2, Loader2, ArrowLeft, Users, BarChart3 } from 'lucide-react'
+import {
+  Calendar, Clock, QrCode, Loader2, ArrowLeft, Users, BarChart3,
+  PartyPopper, ClipboardCheck, Save, Lock, BookOpen, GraduationCap, Sparkles,
+} from 'lucide-react'
 
 type View = 'today' | 'session' | 'summary' | 'teacher'
 
@@ -38,17 +41,19 @@ interface Presence {
   student?: { id: number; nis: string; user?: { name: string } }
 }
 
-const STATUS_COLOR: Record<string, string> = {
-  hadir: 'bg-green-100 text-green-700',
-  terlambat: 'bg-yellow-100 text-yellow-700',
-  sakit: 'bg-blue-100 text-blue-700',
-  izin: 'bg-purple-100 text-purple-700',
-  alfa: 'bg-red-100 text-red-700',
+const STATUS_STYLE: Record<string, { bg: string; text: string; ring: string; label: string; emoji: string }> = {
+  hadir: { bg: 'bg-mint', text: 'text-mint', ring: 'ring-mint/30', label: 'Hadir', emoji: '✓' },
+  terlambat: { bg: 'bg-amber-warm', text: 'text-amber-warm', ring: 'ring-amber-warm/30', label: 'Telat', emoji: '⏱' },
+  sakit: { bg: 'bg-sky-warm', text: 'text-sky-warm', ring: 'ring-sky-warm/30', label: 'Sakit', emoji: 'S' },
+  izin: { bg: 'bg-navy', text: 'text-navy', ring: 'ring-navy/30', label: 'Izin', emoji: 'I' },
+  alfa: { bg: 'bg-rose', text: 'text-rose', ring: 'ring-rose/30', label: 'Alfa', emoji: '✗' },
 }
 
 const STATUS_LABEL: Record<string, string> = {
   hadir: 'H', terlambat: 'T', sakit: 'S', izin: 'I', alfa: 'A',
 }
+
+const DAYS = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
 
 export default function Attendance() {
   const [view, setView] = useState<View>('today')
@@ -64,7 +69,6 @@ export default function Attendance() {
   const fetchToday = async () => {
     setLoading(true)
     try {
-      // Check holiday first
       const today = new Date().toISOString().slice(0, 10)
       const hol = await axios.get('/api/calendar/check-holiday', { params: { date: today } })
       setHoliday(hol.data)
@@ -118,85 +122,135 @@ export default function Attendance() {
     } catch { toast.error('Gagal menutup sesi') }
   }
 
-  const DAYS = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
+  const tabs: { key: View; label: string; icon: any }[] = [
+    { key: 'today', label: 'Hari Ini', icon: Calendar },
+    { key: 'summary', label: 'Rekap', icon: BarChart3 },
+    { key: 'teacher', label: 'Guru', icon: Users },
+  ]
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="p-4 lg:p-8 space-y-5 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
           {view !== 'today' && (
-            <button onClick={() => { setView('today'); setActiveSession(null) }}
-              className="p-2 rounded-lg hover:bg-gray-100"><ArrowLeft className="w-5 h-5" /></button>
+            <button
+              onClick={() => { setView('today'); setActiveSession(null) }}
+              className="p-2.5 rounded-2xl bg-white border border-warm/60 hover:bg-amber-soft text-navy transition shadow-card"
+            >
+              <ArrowLeft className="w-5 h-5" strokeWidth={2.4} />
+            </button>
           )}
-          <h1 className="text-2xl font-bold text-gray-900">
-            {view === 'today' && (isTeacher ? 'Absensi Hari Ini' : 'Sesi Absensi Hari Ini')}
-            {view === 'session' && 'Sesi Absensi'}
-            {view === 'summary' && 'Rekap Absensi'}
-            {view === 'teacher' && 'Rekap Kehadiran Guru'}
-          </h1>
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-navy">
+              {view === 'today' && (isTeacher ? 'Absensi Hari Ini' : 'Sesi Absensi Hari Ini')}
+              {view === 'session' && 'Sesi Absensi'}
+              {view === 'summary' && 'Rekap Absensi'}
+              {view === 'teacher' && 'Rekap Kehadiran Guru'}
+            </h1>
+            <p className="text-sm text-navy/60 mt-0.5">
+              {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setView('today')}
-            className={`px-3 py-2 rounded-lg text-sm font-medium ${view === 'today' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
-            <Calendar className="w-4 h-4 inline mr-1" /> Hari Ini
-          </button>
-          <button onClick={() => setView('summary')}
-            className={`px-3 py-2 rounded-lg text-sm font-medium ${view === 'summary' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
-            <BarChart3 className="w-4 h-4 inline mr-1" /> Rekap
-          </button>
-          <button onClick={() => setView('teacher')}
-            className={`px-3 py-2 rounded-lg text-sm font-medium ${view === 'teacher' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
-            <Users className="w-4 h-4 inline mr-1" /> Guru
-          </button>
-        </div>
+
+        {/* Tab pills */}
+        {view !== 'session' && (
+          <div className="flex gap-1.5 bg-white border border-warm/60 rounded-2xl p-1.5 shadow-card">
+            {tabs.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setView(tab.key)}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                  view === tab.key
+                    ? 'gradient-warm text-white shadow-warm-sm'
+                    : 'text-navy/60 hover:text-navy hover:bg-amber-soft/50'
+                }`}
+              >
+                <tab.icon className="w-3.5 h-3.5" strokeWidth={2.4} /> {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* ===== TODAY view ===== */}
       {view === 'today' && (
         loading ? (
-          <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
+          <div className="flex justify-center py-16">
+            <Loader2 className="w-10 h-10 animate-spin text-amber-warm" strokeWidth={2.4} />
+          </div>
         ) : holiday?.is_holiday ? (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-            <div className="text-4xl mb-2">🏖️</div>
-            <div className="text-lg font-bold text-green-800">Hari Libur</div>
-            <div className="text-green-600 mt-1">{holiday.title}</div>
-            <div className="text-sm text-green-500 mt-2">Absensi tidak aktif hari ini</div>
+          <div className="bg-gradient-to-r from-coral/10 to-amber-soft border-2 border-coral/20 rounded-3xl p-8 text-center shadow-card">
+            <div className="w-20 h-20 bg-coral/15 rounded-3xl flex items-center justify-center mx-auto mb-4">
+              <PartyPopper className="w-10 h-10 text-coral" strokeWidth={2.2} />
+            </div>
+            <div className="text-2xl font-extrabold text-navy mb-1">Hari Libur</div>
+            <div className="text-navy/70 text-base">{holiday.title}</div>
+            <div className="text-sm text-navy/50 mt-2">Absensi tidak aktif hari ini.</div>
           </div>
         ) : isTeacher ? (
           schedules.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
-              Tidak ada jadwal mengajar hari ini ({DAYS[new Date().getDay() || 7]})
+            <div className="bg-white border border-warm/40 rounded-3xl p-12 text-center shadow-card">
+              <ClipboardCheck className="w-12 h-12 text-navy/20 mx-auto mb-3" />
+              <p className="text-navy/60 text-sm font-semibold">
+                Tidak ada jadwal mengajar hari ini ({DAYS[new Date().getDay() || 7]})
+              </p>
             </div>
           ) : (
-            <div className="grid gap-3">
+            <div className="grid gap-3 lg:grid-cols-2">
               {schedules.map(s => (
-                <div key={s.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center justify-between hover:shadow-sm">
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                      <Clock className="w-4 h-4" /> {s.start_time} - {s.end_time}
+                <div
+                  key={s.id}
+                  className="bg-white border border-warm/40 rounded-3xl p-5 shadow-card hover:shadow-card-lg transition-all"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="w-12 h-12 bg-amber-soft rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="w-5 h-5 text-amber-warm" strokeWidth={2.4} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 text-xs text-navy/60 font-semibold mb-1">
+                          <Clock className="w-3.5 h-3.5 text-amber-warm" />
+                          {s.start_time} – {s.end_time}
+                        </div>
+                        <div className="font-bold text-navy text-base leading-tight">{s.subject?.name || '-'}</div>
+                        <div className="text-sm text-navy/60 flex items-center gap-1 mt-0.5">
+                          <GraduationCap className="w-3.5 h-3.5" /> Kelas {s.class?.name || '-'}
+                        </div>
+                      </div>
                     </div>
-                    <div className="font-semibold text-gray-900">{s.subject?.name || '-'}</div>
-                    <div className="text-sm text-gray-600">Kelas {s.class?.name || '-'}</div>
+                    {s.session && (
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide flex-shrink-0 ${
+                        s.session.status === 'open' ? 'bg-mint/15 text-mint' : 'bg-navy/10 text-navy/60'
+                      }`}>
+                        {s.session.status === 'open' ? 'DIBUKA' : 'DITUTUP'}
+                      </span>
+                    )}
                   </div>
-                  <div className="flex gap-2">
+
+                  <div className="flex gap-2 pt-3 border-t border-warm/30">
                     {s.session ? (
-                      <>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${s.session.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                          {s.session.status === 'open' ? 'Sesi Dibuka' : 'Ditutup'}
-                        </span>
-                        <button onClick={() => loadSession(s.session!.id)}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm">
-                          Lanjut
-                        </button>
-                      </>
+                      <button
+                        onClick={() => loadSession(s.session!.id)}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 gradient-warm text-white rounded-2xl font-bold text-sm hover:shadow-warm transition shadow-warm-sm"
+                      >
+                        <ClipboardCheck className="w-4 h-4" strokeWidth={2.5} />
+                        Lanjut Sesi
+                      </button>
                     ) : (
                       <>
-                        <button onClick={() => openSession(s.id, 'manual')}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm flex items-center gap-1">
-                          <Users className="w-4 h-4" /> Manual
+                        <button
+                          onClick={() => openSession(s.id, 'manual')}
+                          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-navy text-white rounded-2xl font-bold text-sm hover:opacity-90 transition"
+                        >
+                          <Users className="w-4 h-4" strokeWidth={2.4} /> Manual
                         </button>
-                        <button onClick={() => openSession(s.id, 'qr')}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm flex items-center gap-1">
-                          <QrCode className="w-4 h-4" /> QR
+                        <button
+                          onClick={() => openSession(s.id, 'qr')}
+                          className="flex-1 flex items-center justify-center gap-2 py-2.5 gradient-warm text-white rounded-2xl font-bold text-sm hover:shadow-warm transition shadow-warm-sm"
+                        >
+                          <QrCode className="w-4 h-4" strokeWidth={2.4} /> QR Code
                         </button>
                       </>
                     )}
@@ -206,28 +260,42 @@ export default function Attendance() {
             </div>
           )
         ) : (
-          // Admin view: list all open/closed sessions across school today
+          // Admin view
           todaySessions.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
-              Belum ada sesi absen dibuka hari ini.
-              <div className="text-xs mt-2">Admin melihat sesi yang dibuka guru. Untuk membuat sesi, login sebagai guru.</div>
+            <div className="bg-white border border-warm/40 rounded-3xl p-12 text-center shadow-card">
+              <ClipboardCheck className="w-12 h-12 text-navy/20 mx-auto mb-3" />
+              <p className="text-navy/60 text-sm font-semibold mb-1">Belum ada sesi absen dibuka hari ini</p>
+              <p className="text-navy/40 text-xs">Admin melihat sesi yang dibuka guru. Untuk membuat sesi, login sebagai guru.</p>
             </div>
           ) : (
-            <div className="grid gap-3">
+            <div className="grid gap-3 lg:grid-cols-2">
               {todaySessions.map(s => (
-                <div key={s.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center justify-between hover:shadow-sm cursor-pointer"
-                  onClick={() => loadSession(s.id)}>
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                      <Clock className="w-4 h-4" /> {s.schedule?.start_time} - {s.schedule?.end_time}
+                <button
+                  key={s.id}
+                  onClick={() => loadSession(s.id)}
+                  className="bg-white border border-warm/40 rounded-3xl p-5 shadow-card hover:shadow-card-lg transition-all text-left"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="w-12 h-12 bg-amber-soft rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="w-5 h-5 text-amber-warm" strokeWidth={2.4} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 text-xs text-navy/60 font-semibold mb-1">
+                          <Clock className="w-3.5 h-3.5 text-amber-warm" />
+                          {s.schedule?.start_time} – {s.schedule?.end_time}
+                        </div>
+                        <div className="font-bold text-navy text-base">{s.schedule?.subject?.name || '-'}</div>
+                        <div className="text-sm text-navy/60">Kelas {s.schedule?.class?.name || '-'}</div>
+                      </div>
                     </div>
-                    <div className="font-semibold text-gray-900">{s.schedule?.subject?.name || '-'}</div>
-                    <div className="text-sm text-gray-600">Kelas {s.schedule?.class?.name || '-'}</div>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide flex-shrink-0 ${
+                      s.status === 'open' ? 'bg-mint/15 text-mint' : 'bg-navy/10 text-navy/60'
+                    }`}>
+                      {s.status === 'open' ? 'DIBUKA' : 'DITUTUP'}
+                    </span>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${s.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                    {s.status === 'open' ? 'Dibuka' : 'Ditutup'}
-                  </span>
-                </div>
+                </button>
               ))}
             </div>
           )
@@ -278,82 +346,150 @@ function SessionPanel({ session, onReload, onClose }: { session: AttendanceSessi
     return acc
   }, {}) || {}
 
+  // Quick mark all hadir
+  const markAllHadir = () => {
+    const next: any = { ...marks }
+    session.presences?.forEach(p => {
+      next[p.student_id] = { ...next[p.student_id], status: 'hadir' }
+    })
+    setMarks(next)
+    toast.success('Semua ditandai Hadir. Klik Simpan untuk konfirmasi.')
+  }
+
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-3">
+      {/* Header */}
+      <div className="bg-navy text-white rounded-3xl p-6 shadow-card-lg relative overflow-hidden">
+        <div className="absolute inset-0 grid-pattern opacity-20"></div>
+        <div className="absolute -right-16 -top-16 w-56 h-56 bg-amber-warm/15 rounded-full blur-3xl"></div>
+
+        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <div className="text-sm text-gray-500">{session.schedule?.subject?.name} — Kelas {session.schedule?.class?.name}</div>
-            <div className="text-xl font-bold">{new Date(session.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-warm/20 border border-amber-warm/30 rounded-full mb-2">
+              <ClipboardCheck className="w-3 h-3 text-amber-warm" strokeWidth={2.5} />
+              <span className="text-[10px] font-extrabold text-amber-200 tracking-wide uppercase">
+                Sesi {session.method === 'qr' ? 'QR Code' : 'Manual'} — {session.status === 'open' ? 'Dibuka' : 'Ditutup'}
+              </span>
+            </div>
+            <h2 className="text-xl lg:text-2xl font-extrabold leading-tight">
+              {session.schedule?.subject?.name} · Kelas {session.schedule?.class?.name}
+            </h2>
+            <p className="text-white/60 text-sm mt-1">
+              {new Date(session.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
           </div>
           <div className="flex gap-2">
             {session.status === 'open' && (
-              <button onClick={onClose} className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 text-sm">
-                Tutup Sesi
-              </button>
+              <>
+                <button
+                  onClick={markAllHadir}
+                  className="px-4 py-2.5 bg-white/10 border border-white/20 text-white rounded-2xl font-bold text-sm hover:bg-white/15 flex items-center gap-2 transition"
+                >
+                  <Sparkles className="w-4 h-4" strokeWidth={2.4} /> Semua Hadir
+                </button>
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2.5 bg-rose/20 border border-rose/30 text-rose-300 rounded-2xl font-bold text-sm hover:bg-rose/30 flex items-center gap-2 transition"
+                >
+                  <Lock className="w-4 h-4" strokeWidth={2.4} /> Tutup Sesi
+                </button>
+              </>
             )}
           </div>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {['hadir', 'terlambat', 'sakit', 'izin', 'alfa'].map(s => (
-            <span key={s} className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_COLOR[s]}`}>
-              {s}: {stats[s] || 0}
-            </span>
+
+        {/* Stats pills */}
+        <div className="relative mt-5 flex flex-wrap gap-2">
+          {(['hadir', 'terlambat', 'sakit', 'izin', 'alfa'] as const).map(s => (
+            <div key={s} className={`flex items-center gap-2 px-3 py-1.5 ${STATUS_STYLE[s].bg} bg-opacity-90 rounded-full text-white text-xs font-extrabold`}>
+              <span>{STATUS_STYLE[s].label}</span>
+              <span className="bg-white/25 px-2 py-0.5 rounded-full text-[11px]">{stats[s] || 0}</span>
+            </div>
           ))}
         </div>
       </div>
 
+      {/* QR section */}
       {session.method === 'qr' && session.qr_token && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 text-center">
-          <div className="text-sm text-gray-500 mb-2">Siswa scan QR di app-nya</div>
-          <img src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(session.qr_token)}`}
-            alt="QR Code" className="mx-auto rounded-lg" />
-          <div className="text-xs text-gray-400 mt-2">Token: {session.qr_token}</div>
+        <div className="bg-white border border-warm/40 rounded-3xl p-6 shadow-card text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-soft border border-warm rounded-full mb-3">
+            <QrCode className="w-3.5 h-3.5 text-amber-warm" strokeWidth={2.5} />
+            <span className="text-xs font-extrabold text-amber-warm uppercase tracking-wide">Scan untuk absen</span>
+          </div>
+          <div className="text-sm text-navy/60 mb-4">Siswa scan QR di app mereka untuk menandai kehadiran</div>
+          <div className="inline-block p-4 bg-cream-soft border-2 border-warm/60 rounded-3xl">
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(session.qr_token)}`}
+              alt="QR Code"
+              className="rounded-2xl"
+            />
+          </div>
+          <div className="text-xs text-navy/40 mt-3 font-mono">{session.qr_token}</div>
           {session.qr_expires && (
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-navy/60 mt-1 font-semibold">
               Berlaku sampai {new Date(session.qr_expires).toLocaleTimeString('id-ID')}
             </div>
           )}
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      {/* Student list — desktop table */}
+      <div className="hidden lg:block bg-white border border-warm/40 rounded-3xl overflow-hidden shadow-card">
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-amber-soft/40 border-b border-warm/40">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Siswa</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telat (min)</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catatan</th>
+              <th className="px-5 py-4 text-left text-[11px] font-extrabold text-navy uppercase tracking-wider">Siswa</th>
+              <th className="px-5 py-4 text-left text-[11px] font-extrabold text-navy uppercase tracking-wider">Status</th>
+              <th className="px-5 py-4 text-left text-[11px] font-extrabold text-navy uppercase tracking-wider">Telat (mnt)</th>
+              <th className="px-5 py-4 text-left text-[11px] font-extrabold text-navy uppercase tracking-wider">Catatan</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-warm/30">
             {session.presences?.map(p => {
               const m = marks[p.student_id] || { status: p.status, note: '', late_min: 0 }
               return (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm">
-                    <div className="font-medium">{p.student?.user?.name || '-'}</div>
-                    <div className="text-xs text-gray-400">{p.student?.nis || '-'}</div>
+                <tr key={p.id} className="hover:bg-cream-soft transition">
+                  <td className="px-5 py-3">
+                    <div className="font-bold text-navy text-sm">{p.student?.user?.name || '-'}</div>
+                    <div className="text-xs text-navy/50 font-mono">{p.student?.nis || '-'}</div>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-5 py-3">
                     <div className="flex gap-1">
-                      {(['hadir', 'terlambat', 'sakit', 'izin', 'alfa'] as const).map(s => (
-                        <button key={s} onClick={() => setMark(p.student_id, { status: s })}
-                          className={`w-9 h-9 rounded-lg text-xs font-semibold ${m.status === s ? STATUS_COLOR[s] + ' ring-2 ring-offset-1 ring-indigo-400' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
-                          title={s}>
-                          {STATUS_LABEL[s]}
-                        </button>
-                      ))}
+                      {(['hadir', 'terlambat', 'sakit', 'izin', 'alfa'] as const).map(s => {
+                        const active = m.status === s
+                        return (
+                          <button
+                            key={s}
+                            onClick={() => setMark(p.student_id, { status: s })}
+                            className={`w-9 h-9 rounded-xl text-xs font-extrabold transition ${
+                              active
+                                ? `${STATUS_STYLE[s].bg} text-white shadow-warm-sm`
+                                : 'bg-cream-soft text-navy/40 hover:bg-amber-soft hover:text-navy'
+                            }`}
+                            title={STATUS_STYLE[s].label}
+                          >
+                            {STATUS_LABEL[s]}
+                          </button>
+                        )
+                      })}
                     </div>
                   </td>
-                  <td className="px-4 py-2">
-                    <input type="number" value={m.late_min} onChange={e => setMark(p.student_id, { late_min: Number(e.target.value) })}
-                      className="w-16 px-2 py-1 border rounded-lg text-sm" disabled={m.status !== 'terlambat'} />
+                  <td className="px-5 py-3">
+                    <input
+                      type="number"
+                      value={m.late_min}
+                      onChange={e => setMark(p.student_id, { late_min: Number(e.target.value) })}
+                      disabled={m.status !== 'terlambat'}
+                      className="w-20 px-3 py-1.5 rounded-xl border border-warm/60 text-sm font-semibold text-navy disabled:opacity-40 disabled:bg-cream-soft focus:outline-none focus:border-amber-warm"
+                    />
                   </td>
-                  <td className="px-4 py-2">
-                    <input value={m.note} onChange={e => setMark(p.student_id, { note: e.target.value })}
-                      placeholder="-" className="w-full px-2 py-1 border rounded-lg text-sm" />
+                  <td className="px-5 py-3">
+                    <input
+                      value={m.note}
+                      onChange={e => setMark(p.student_id, { note: e.target.value })}
+                      placeholder="—"
+                      className="w-full px-3 py-1.5 rounded-xl border border-warm/60 text-sm text-navy focus:outline-none focus:border-amber-warm"
+                    />
                   </td>
                 </tr>
               )
@@ -362,11 +498,74 @@ function SessionPanel({ session, onReload, onClose }: { session: AttendanceSessi
         </table>
       </div>
 
-      <div className="flex justify-end">
-        <button onClick={save} disabled={saving || session.status === 'closed'}
-          className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-          Simpan Absensi
+      {/* Mobile cards */}
+      <div className="lg:hidden space-y-3">
+        {session.presences?.map(p => {
+          const m = marks[p.student_id] || { status: p.status, note: '', late_min: 0 }
+          return (
+            <div key={p.id} className="bg-white border border-warm/40 rounded-2xl p-4 shadow-card">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="min-w-0">
+                  <div className="font-bold text-navy text-sm truncate">{p.student?.user?.name || '-'}</div>
+                  <div className="text-xs text-navy/50 font-mono">{p.student?.nis || '-'}</div>
+                </div>
+                <div className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${STATUS_STYLE[m.status]?.bg || 'bg-navy/10'} text-white`}>
+                  {STATUS_STYLE[m.status]?.label.toUpperCase() || '—'}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-5 gap-1.5 mb-2">
+                {(['hadir', 'terlambat', 'sakit', 'izin', 'alfa'] as const).map(s => {
+                  const active = m.status === s
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => setMark(p.student_id, { status: s })}
+                      className={`py-2.5 rounded-xl text-xs font-extrabold transition ${
+                        active
+                          ? `${STATUS_STYLE[s].bg} text-white shadow-warm-sm`
+                          : 'bg-cream-soft text-navy/40'
+                      }`}
+                    >
+                      {STATUS_LABEL[s]}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {m.status === 'terlambat' && (
+                <input
+                  type="number"
+                  value={m.late_min}
+                  onChange={e => setMark(p.student_id, { late_min: Number(e.target.value) })}
+                  placeholder="Telat berapa menit?"
+                  className="w-full px-3 py-2 rounded-xl border border-warm/60 text-sm font-semibold text-navy mb-2 focus:outline-none focus:border-amber-warm"
+                />
+              )}
+
+              <input
+                value={m.note}
+                onChange={e => setMark(p.student_id, { note: e.target.value })}
+                placeholder="Catatan (opsional)"
+                className="w-full px-3 py-2 rounded-xl border border-warm/60 text-sm text-navy focus:outline-none focus:border-amber-warm"
+              />
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Sticky save bar */}
+      <div className="sticky bottom-20 lg:bottom-4 z-20 flex justify-end">
+        <button
+          onClick={save}
+          disabled={saving || session.status === 'closed'}
+          className="px-6 py-3.5 gradient-warm text-white rounded-2xl shadow-warm font-bold text-sm hover:shadow-card-lg transition disabled:opacity-50 flex items-center gap-2"
+        >
+          {saving ? (
+            <><Loader2 className="w-4 h-4 animate-spin" /> Menyimpan...</>
+          ) : (
+            <><Save className="w-4 h-4" strokeWidth={2.5} /> Simpan Absensi</>
+          )}
         </button>
       </div>
     </div>
@@ -395,64 +594,75 @@ function SummaryPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-3 items-end">
-        <div className="flex-1">
-          <label className="block text-sm text-gray-600 mb-1">Kelas</label>
-          <select value={classId} onChange={e => setClassId(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg">
+      <div className="bg-white border border-warm/40 rounded-3xl p-5 shadow-card grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs font-extrabold text-navy uppercase tracking-wide mb-1.5">Kelas</label>
+          <select
+            value={classId}
+            onChange={e => setClassId(e.target.value)}
+            className="w-full px-4 py-3 rounded-2xl bg-white border-2 border-warm/60 focus:ring-4 focus:ring-amber-warm/15 focus:border-amber-warm outline-none transition text-sm font-semibold text-navy"
+          >
             <option value="">Pilih kelas...</option>
             {classes.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
-        <div className="flex-1">
-          <label className="block text-sm text-gray-600 mb-1">Bulan</label>
-          <input type="month" value={month} onChange={e => setMonth(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg" />
+        <div>
+          <label className="block text-xs font-extrabold text-navy uppercase tracking-wide mb-1.5">Bulan</label>
+          <input
+            type="month"
+            value={month}
+            onChange={e => setMonth(e.target.value)}
+            className="w-full px-4 py-3 rounded-2xl bg-white border-2 border-warm/60 focus:ring-4 focus:ring-amber-warm/15 focus:border-amber-warm outline-none transition text-sm font-semibold text-navy"
+          />
         </div>
       </div>
 
       {!classId ? (
-        <div className="text-center text-gray-400 py-12">Pilih kelas dulu</div>
+        <div className="bg-white border border-warm/40 rounded-3xl py-12 text-center shadow-card">
+          <BarChart3 className="w-12 h-12 text-navy/20 mx-auto mb-3" />
+          <p className="text-navy/60 text-sm font-semibold">Pilih kelas dulu untuk melihat rekap</p>
+        </div>
       ) : loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
+        <div className="flex justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-amber-warm" strokeWidth={2.4} />
+        </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50">
+        <div className="bg-white border border-warm/40 rounded-3xl shadow-card overflow-x-auto">
+          <table className="w-full min-w-[640px]">
+            <thead className="bg-amber-soft/40 border-b border-warm/40">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Siswa</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">H</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">T</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">S</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">I</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">A</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Total</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">%</th>
+                <th className="px-4 py-3 text-left text-[11px] font-extrabold text-navy uppercase tracking-wider">Siswa</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-mint uppercase">H</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-amber-warm uppercase">T</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-sky-warm uppercase">S</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-navy uppercase">I</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-rose uppercase">A</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-navy uppercase">Total</th>
+                <th className="px-4 py-3 text-center text-[11px] font-extrabold text-navy uppercase">%</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-warm/30">
               {rows.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">Belum ada data</td></tr>
-              ) : rows.map(r => (
-                <tr key={r.student_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2">
-                    <div className="font-medium">{r.name}</div>
-                    <div className="text-xs text-gray-400">{r.nis}</div>
-                  </td>
-                  <td className="px-4 py-2 text-center text-green-600 font-semibold">{r.hadir ?? 0}</td>
-                  <td className="px-4 py-2 text-center text-yellow-600 font-semibold">{r.terlambat ?? 0}</td>
-                  <td className="px-4 py-2 text-center text-blue-600">{r.sakit ?? 0}</td>
-                  <td className="px-4 py-2 text-center text-purple-600">{r.izin ?? 0}</td>
-                  <td className="px-4 py-2 text-center text-red-600 font-semibold">{r.alfa ?? 0}</td>
-                  <td className="px-4 py-2 text-center">{r.total ?? 0}</td>
-                  <td className="px-4 py-2 text-center font-semibold">
-                    {(() => {
-                      const p = Number(r.persentase ?? 0)
-                      return <span className={p >= 80 ? 'text-green-600' : p >= 60 ? 'text-yellow-600' : 'text-red-600'}>{p.toFixed(1)}%</span>
-                    })()}
-                  </td>
-                </tr>
-              ))}
+                <tr><td colSpan={8} className="px-4 py-12 text-center text-navy/40 text-sm font-semibold">Belum ada data</td></tr>
+              ) : rows.map(r => {
+                const p = Number(r.persentase ?? 0)
+                const pColor = p >= 80 ? 'text-mint' : p >= 60 ? 'text-amber-warm' : 'text-rose'
+                return (
+                  <tr key={r.student_id} className="hover:bg-cream-soft transition">
+                    <td className="px-4 py-3">
+                      <div className="font-bold text-navy text-sm">{r.name}</div>
+                      <div className="text-xs text-navy/50 font-mono">{r.nis}</div>
+                    </td>
+                    <td className="px-3 py-3 text-center text-mint font-extrabold">{r.hadir ?? 0}</td>
+                    <td className="px-3 py-3 text-center text-amber-warm font-extrabold">{r.terlambat ?? 0}</td>
+                    <td className="px-3 py-3 text-center text-sky-warm font-bold">{r.sakit ?? 0}</td>
+                    <td className="px-3 py-3 text-center text-navy font-bold">{r.izin ?? 0}</td>
+                    <td className="px-3 py-3 text-center text-rose font-extrabold">{r.alfa ?? 0}</td>
+                    <td className="px-3 py-3 text-center font-bold text-navy">{r.total ?? 0}</td>
+                    <td className={`px-4 py-3 text-center font-extrabold ${pColor}`}>{p.toFixed(1)}%</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -477,46 +687,50 @@ function TeacherSummaryPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-3 items-end">
-        <div className="flex-1">
-          <label className="block text-sm text-gray-600 mb-1">Bulan</label>
-          <input type="month" value={month} onChange={e => setMonth(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg" />
-        </div>
+      <div className="bg-white border border-warm/40 rounded-3xl p-5 shadow-card">
+        <label className="block text-xs font-extrabold text-navy uppercase tracking-wide mb-1.5">Bulan</label>
+        <input
+          type="month"
+          value={month}
+          onChange={e => setMonth(e.target.value)}
+          className="w-full sm:w-64 px-4 py-3 rounded-2xl bg-white border-2 border-warm/60 focus:ring-4 focus:ring-amber-warm/15 focus:border-amber-warm outline-none transition text-sm font-semibold text-navy"
+        />
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>
+        <div className="flex justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-amber-warm" strokeWidth={2.4} />
+        </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50">
+        <div className="bg-white border border-warm/40 rounded-3xl shadow-card overflow-x-auto">
+          <table className="w-full min-w-[640px]">
+            <thead className="bg-amber-soft/40 border-b border-warm/40">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guru</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIP</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Jadwal</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Hadir</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Tidak Hadir</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">%</th>
+                <th className="px-4 py-3 text-left text-[11px] font-extrabold text-navy uppercase tracking-wider">Guru</th>
+                <th className="px-4 py-3 text-left text-[11px] font-extrabold text-navy uppercase tracking-wider">NIP</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-navy uppercase">Jadwal</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-mint uppercase">Hadir</th>
+                <th className="px-3 py-3 text-center text-[11px] font-extrabold text-rose uppercase">Tidak Hadir</th>
+                <th className="px-4 py-3 text-center text-[11px] font-extrabold text-navy uppercase">%</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-warm/30">
               {rows.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Belum ada data</td></tr>
-              ) : rows.map(r => (
-                <tr key={r.teacher_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 font-medium">{r.teacher_name}</td>
-                  <td className="px-4 py-2 text-sm text-gray-500">{r.nip}</td>
-                  <td className="px-4 py-2 text-center">{r.total_jadwal}</td>
-                  <td className="px-4 py-2 text-center text-green-600 font-semibold">{r.hadir}</td>
-                  <td className="px-4 py-2 text-center text-red-600 font-semibold">{r.tidak_hadir}</td>
-                  <td className="px-4 py-2 text-center font-semibold">
-                    <span className={r.persentase >= 80 ? 'text-green-600' : r.persentase >= 60 ? 'text-yellow-600' : 'text-red-600'}>
-                      {r.persentase.toFixed(1)}%
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                <tr><td colSpan={6} className="px-4 py-12 text-center text-navy/40 text-sm font-semibold">Belum ada data</td></tr>
+              ) : rows.map(r => {
+                const p = Number(r.persentase ?? 0)
+                const pColor = p >= 80 ? 'text-mint' : p >= 60 ? 'text-amber-warm' : 'text-rose'
+                return (
+                  <tr key={r.teacher_id} className="hover:bg-cream-soft transition">
+                    <td className="px-4 py-3 font-bold text-navy text-sm">{r.teacher_name}</td>
+                    <td className="px-4 py-3 text-sm text-navy/60 font-mono">{r.nip}</td>
+                    <td className="px-3 py-3 text-center font-bold text-navy">{r.total_jadwal}</td>
+                    <td className="px-3 py-3 text-center text-mint font-extrabold">{r.hadir}</td>
+                    <td className="px-3 py-3 text-center text-rose font-extrabold">{r.tidak_hadir}</td>
+                    <td className={`px-4 py-3 text-center font-extrabold ${pColor}`}>{p.toFixed(1)}%</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
