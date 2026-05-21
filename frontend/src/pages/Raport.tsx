@@ -269,15 +269,15 @@ export default function Raport() {
         </select>
         {classFilter > 0 && semesterFilter > 0 && (
           <button onClick={downloadAllRaport}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm hover:bg-green-700 transition">
-            <Download className="w-4 h-4" /> Download Semua PDF
+            className="flex items-center gap-2 px-4 py-2.5 bg-mint text-white rounded-2xl text-sm font-bold hover:opacity-90 shadow-card transition">
+            <Download className="w-4 h-4" strokeWidth={2.5} /> Download Semua (ZIP)
           </button>
         )}
       </div>
 
       {/* Table */}
       {loading ? (
-        <div className="flex justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-warm border-t-indigo-600 rounded-full"></div></div>
+        <div className="flex justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-warm border-t-amber-warm rounded-full"></div></div>
       ) : (
         <div className="bg-white rounded-2xl border overflow-hidden">
           <table className="w-full text-sm">

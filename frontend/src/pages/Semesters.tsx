@@ -44,6 +44,8 @@ export default function Semesters() {
     const payload = {
       ...form,
       name: updateName(form.year, form.period),
+      start_date: form.start_date ? `${form.start_date}T00:00:00Z` : '',
+      end_date: form.end_date ? `${form.end_date}T00:00:00Z` : '',
     }
 
     try {
