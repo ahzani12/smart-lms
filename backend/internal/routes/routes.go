@@ -169,6 +169,10 @@ func Setup(app *fiber.App) {
 	school.Get("/", handlers.GetSchool)
 	school.Put("/", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UpdateSchool)
 	school.Post("/logo", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UploadSchoolLogo)
+	// Lokasi & anti fake-GPS
+	school.Get("/location", handlers.GetSchoolLocation)
+	school.Put("/location", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UpdateSchoolLocation)
+	school.Get("/location-logs", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.GetTeacherLocationLogs)
 
 	// ─── Calendar ──────────────────────────────────────
 	calendar := api.Group("/calendar", middleware.AuthRequired)

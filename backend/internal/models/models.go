@@ -40,6 +40,14 @@ type School struct {
 	HeaderLogo  string         `json:"header_logo" gorm:"size:500"` // custom raport header
 	HeaderText  string         `json:"header_text" gorm:"type:text"` // custom raport text
 	HeaderColor string         `json:"header_color" gorm:"size:20;default:'#1e40af'"`
+
+	// ─── Lokasi & anti fake-GPS (opsional, opt-in per sekolah) ───
+	Latitude            *float64 `json:"latitude" gorm:"type:double precision"`           // koordinat sekolah
+	Longitude           *float64 `json:"longitude" gorm:"type:double precision"`          // koordinat sekolah
+	AttendanceRadiusM   int      `json:"attendance_radius_m" gorm:"default:150"`          // radius valid dalam meter
+	GPSRequired         bool     `json:"gps_required" gorm:"default:false"`               // wajib GPS untuk buka sesi absensi
+	GPSMaxAccuracyM     int      `json:"gps_max_accuracy_m" gorm:"default:100"`           // tolak kalau accuracy > nilai ini
+	GPSMaxLocationAgeS  int      `json:"gps_max_location_age_s" gorm:"default:60"`        // tolak coords cached > nilai ini
 }
 
 // ─── Academic ─────────────────────────────────────────────
@@ -420,6 +428,7 @@ func AutoMigrate(db *gorm.DB) {
 		&Schedule{},
 		&AttendanceSession{},
 		&Presence{},
+		&TeacherLocationLog{},
 		// Lain-lain
 		&Raport{},
 		&RaportItem{},

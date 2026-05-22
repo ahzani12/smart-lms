@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, UserCircle, Building2, FileQuestion,
   BookOpen, ClipboardCheck, GraduationCap, Calendar, Sparkles,
   LogOut, Menu, X, ChevronDown, CalendarClock, Trophy, Heart,
-  Settings, ClipboardEdit, FileText, Key, School, Shield,
+  Settings, ClipboardEdit, FileText, Key, School, Shield, MapPin,
   Bell, Search, Plus,
 } from 'lucide-react'
 
@@ -30,6 +30,7 @@ export const navItems = [
   { to: '/report-components', icon: Settings, label: 'Komponen Raport', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/ai-hub', icon: Sparkles, label: 'AI Hub', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
   { to: '/school-settings', icon: School, label: 'Pengaturan Sekolah', roles: ['admin_pusat'] },
+  { to: '/location-settings', icon: MapPin, label: 'Lokasi & GPS', roles: ['admin_pusat'] },
   // Superadmin
   { to: '/super', icon: Shield, label: 'Overview', roles: ['superadmin'] },
   { to: '/super/schools', icon: Building2, label: 'Kelola Sekolah', roles: ['superadmin'] },

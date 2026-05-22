@@ -27,6 +27,7 @@ import ParentLogin from './pages/ParentLogin'
 import ParentPortal from './pages/ParentPortal'
 import Semesters from './pages/Semesters'
 import SchoolSettings from './pages/SchoolSettings'
+import LocationSettings from './pages/LocationSettings'
 import SuperDashboard from './pages/super/SuperDashboard'
 import SuperSchools from './pages/super/SuperSchools'
 import SuperAdmins from './pages/super/SuperAdmins'
@@ -72,6 +73,7 @@ export default function App() {
             <Route path="parent-access" element={<ParentAccessPage />} />
             <Route path="semesters" element={<Semesters />} />
             <Route path="school-settings" element={<SchoolSettings />} />
+            <Route path="location-settings" element={<LocationSettings />} />
             <Route path="report-components" element={<ReportComponents />} />
             <Route path="input-scores" element={<InputScores />} />
             <Route path="generate-raport" element={<GenerateRaport />} />

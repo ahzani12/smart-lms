@@ -5,6 +5,7 @@ import {
   Calendar, Clock, QrCode, Loader2, ArrowLeft, Users, BarChart3,
   PartyPopper, ClipboardCheck, Save, Lock, BookOpen, GraduationCap, Sparkles,
 } from 'lucide-react'
+import { getCurrentPositionSafe } from '../utils/geolocation'
 
 type View = 'today' | 'session' | 'summary' | 'teacher'
 
@@ -95,13 +96,47 @@ export default function Attendance() {
   const openSession = async (scheduleId: number, method: 'manual' | 'qr') => {
     try {
       const today = new Date().toISOString().slice(0, 10)
+
+      // ─── Anti fake-GPS: cek dulu apakah sekolah require GPS ───
+      let gpsPayload: any = undefined
+      try {
+        const cfg = await axios.get('/api/school/location')
+        if (cfg.data?.gps_required) {
+          const toastId = toast.loading('📍 Memeriksa lokasi...')
+          const result = await getCurrentPositionSafe({
+            maxAccuracyM: cfg.data.gps_max_accuracy_m || 100,
+            timeoutMs: 12000,
+          })
+          toast.dismiss(toastId)
+          if (!result.ok) {
+            toast.error(result.error.message, { duration: 5000 })
+            return
+          }
+          gpsPayload = result.reading
+        }
+      } catch {
+        /* school config gagal di-fetch — lanjut tanpa GPS, biar backend yang reject */
+      }
+
       const res = await axios.post('/api/attendance/sessions/open', {
         schedule_id: scheduleId, date: today, method, qr_duration_minutes: 15,
+        gps: gpsPayload,
       })
       toast.success('Sesi dibuka')
       await loadSession(res.data.id)
     } catch (e: any) {
-      toast.error(e.response?.data?.error || 'Gagal buka sesi')
+      const data = e.response?.data
+      // Tampilkan reject reason GPS lebih informatif
+      if (data?.reject_reason === 'distance' && data?.distance_m) {
+        toast.error(
+          `📍 Anda di luar area sekolah (${data.distance_m}m, max ${data.radius_m}m)`,
+          { duration: 6000 },
+        )
+      } else if (data?.gps_required && data?.reject_reason) {
+        toast.error(data.error || 'Validasi lokasi gagal', { duration: 6000 })
+      } else {
+        toast.error(data?.error || 'Gagal buka sesi')
+      }
     }
   }
 

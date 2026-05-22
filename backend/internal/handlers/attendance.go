@@ -8,6 +8,7 @@ import (
 
 	"smart-lms/internal/config"
 	"smart-lms/internal/models"
+	"smart-lms/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -126,6 +127,8 @@ func OpenAttendanceSession(c *fiber.Ctx) error {
 		Date       string `json:"date"`   // "2026-05-11"
 		Method     string `json:"method"` // manual | qr
 		QRDuration int    `json:"qr_duration_minutes"`
+		// Anti fake-GPS payload
+		GPS *utils.GPSReading `json:"gps"`
 	}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
@@ -156,6 +159,82 @@ func OpenAttendanceSession(c *fiber.Ctx) error {
 	if isGuru(c) && schedule.TeacherID != teacher.ID {
 		return c.Status(403).JSON(fiber.Map{"error": "Jadwal ini bukan milik Anda"})
 	}
+
+	// ─── ANTI FAKE-GPS CHECK ───────────────────────────────────
+	// Cuma di-enforce kalau:
+	//   1. Sekolah set GPSRequired = true
+	//   2. User adalah guru (admin bypass — bisa buka manual)
+	var school models.School
+	config.DB.First(&school, sid)
+
+	if school.GPSRequired && isGuru(c) {
+		if req.GPS == nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error":  "Lokasi GPS wajib. Aktifkan GPS dan izinkan akses lokasi.",
+				"gps_required": true,
+				"reject_reason": "no_gps",
+			})
+		}
+
+		radius := school.AttendanceRadiusM
+		if radius <= 0 {
+			radius = 150
+		}
+		maxAcc := school.GPSMaxAccuracyM
+		if maxAcc <= 0 {
+			maxAcc = 100
+		}
+		maxAge := school.GPSMaxLocationAgeS
+		if maxAge <= 0 {
+			maxAge = 60
+		}
+
+		validation := utils.ValidateGPS(*req.GPS, school.Latitude, school.Longitude, radius, maxAcc, maxAge)
+
+		// Speed anomaly: bandingkan dengan log terakhir guru ini (last 1 jam)
+		var lastLog models.TeacherLocationLog
+		hourAgo := time.Now().Add(-1 * time.Hour)
+		if err := config.DB.Where("user_id = ? AND created_at > ? AND allowed = ?", userID, hourAgo, true).
+			Order("created_at desc").First(&lastLog).Error; err == nil {
+			isAnomaly, speedKmh := utils.CheckSpeed(
+				lastLog.Latitude, lastLog.Longitude, lastLog.CreatedAt,
+				req.GPS.Latitude, req.GPS.Longitude, time.Now(), 200.0,
+			)
+			if isAnomaly {
+				validation.Allowed = false
+				validation.RejectReason = "speed"
+				validation.Message = fmt.Sprintf("Pergerakan tidak wajar (%.0f km/jam). Coba lagi dalam beberapa menit.", speedKmh)
+			}
+		}
+
+		// Audit log — selalu disimpan, baik allowed maupun reject
+		_ = config.DB.Create(&models.TeacherLocationLog{
+			SchoolID:     sid,
+			UserID:       userID,
+			ScheduleID:   &req.ScheduleID,
+			Latitude:     req.GPS.Latitude,
+			Longitude:    req.GPS.Longitude,
+			AccuracyM:    req.GPS.AccuracyM,
+			DistanceM:    validation.DistanceM,
+			LocationAge:  validation.LocationAge,
+			IPAddress:    c.IP(),
+			UserAgent:    c.Get("User-Agent"),
+			Action:       "open_session",
+			Allowed:      validation.Allowed,
+			RejectReason: validation.RejectReason,
+		}).Error
+
+		if !validation.Allowed {
+			return c.Status(403).JSON(fiber.Map{
+				"error":         validation.Message,
+				"reject_reason": validation.RejectReason,
+				"distance_m":    int(validation.DistanceM),
+				"radius_m":      radius,
+				"gps_required":  true,
+			})
+		}
+	}
+	// ─── END GPS CHECK ──────────────────────────────────────────
 
 	// Cek sesi sudah pernah dibuka hari itu
 	var existing models.AttendanceSession
