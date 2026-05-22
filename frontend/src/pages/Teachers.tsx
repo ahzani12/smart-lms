@@ -1,4 +1,5 @@
 import CRUDPage from '../components/CRUDPage'
+import ResetPasswordButton from '../components/ResetPasswordButton'
 
 export default function Teachers() {
   return (
@@ -16,6 +17,14 @@ export default function Teachers() {
         { key: 'nip', label: 'NIP' },
         { key: 'phone', label: 'Telepon' },
       ]}
+      rowExtraActions={(row) =>
+        row.user?.id ? (
+          <ResetPasswordButton
+            userId={row.user.id}
+            userName={row.user.name || 'Guru'}
+          />
+        ) : null
+      }
     />
   )
 }

@@ -31,6 +31,9 @@ func Setup(app *fiber.App) {
 	users.Post("/", handlers.CreateUser)
 	users.Put("/:id", handlers.UpdateUser)
 	users.Delete("/:id", handlers.DeleteUser)
+	users.Post("/:id/reset-password", handlers.ResetUserPassword)
+	users.Post("/bulk-reset-password", handlers.BulkResetPassword)
+	users.Get("/password-reset-logs", handlers.GetPasswordResetLogs)
 
 	// ─── Students ──────────────────────────────────────
 	students := api.Group("/students", middleware.AuthRequired)

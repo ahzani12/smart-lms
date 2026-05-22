@@ -3,6 +3,8 @@ package handlers
 import (
 	"regexp"
 	"strings"
+	"time"
+
 	"smart-lms/internal/config"
 	"smart-lms/internal/middleware"
 	"smart-lms/internal/models"
@@ -113,15 +115,44 @@ func ChangePassword(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
+	req.NewPassword = strings.TrimSpace(req.NewPassword)
+	if len(req.NewPassword) < 6 {
+		return c.Status(400).JSON(fiber.Map{"error": "Password baru minimal 6 karakter"})
+	}
+
 	var user models.User
 	config.DB.First(&user, userID)
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.OldPassword)); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "Password lama salah"})
+	// Skip cek old password kalau force change setelah reset oleh admin
+	if !user.MustChangePassword {
+		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.OldPassword)); err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "Password lama salah"})
+		}
+	}
+
+	// Cegah pakai password yang sama
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.NewPassword)); err == nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Password baru harus berbeda dari password sebelumnya"})
 	}
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
-	config.DB.Model(&user).Update("password", string(hash))
+	now := time.Now()
+	config.DB.Model(&user).Updates(map[string]interface{}{
+		"password":             string(hash),
+		"must_change_password": false,
+		"password_changed_at":  &now,
+	})
 
-	return c.JSON(fiber.Map{"message": "Password changed"})
+	// Audit log
+	config.DB.Create(&models.PasswordResetLog{
+		SchoolID:     user.SchoolID,
+		AdminID:      userID,
+		TargetUserID: userID,
+		Action:       "self_change",
+		IPAddress:    c.IP(),
+		UserAgent:    c.Get("User-Agent"),
+		Note:         "User ganti password sendiri",
+	})
+
+	return c.JSON(fiber.Map{"message": "Password berhasil diganti"})
 }

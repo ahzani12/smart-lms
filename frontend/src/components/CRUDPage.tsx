@@ -5,12 +5,13 @@ import { Plus, Search, Edit2, Trash2, Loader2, X, FileX, Save } from 'lucide-rea
 
 interface Column { key: string; label: string; render?: (val: any, row: any) => any }
 
-export default function CRUDPage({ title, endpoint, columns, formFields, extraActions }: {
+export default function CRUDPage({ title, endpoint, columns, formFields, extraActions, rowExtraActions }: {
   title: string
   endpoint: string
   columns: Column[]
   formFields: { key: string; label: string; type?: string; options?: { label: string; value: any }[] }[]
   extraActions?: React.ReactNode
+  rowExtraActions?: (row: any, refetch: () => void) => React.ReactNode
 }) {
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -163,6 +164,7 @@ export default function CRUDPage({ title, endpoint, columns, formFields, extraAc
                     ))}
                     <td className="px-6 py-4 text-right">
                       <div className="inline-flex items-center gap-1">
+                        {rowExtraActions && rowExtraActions(row, fetchData)}
                         <button
                           onClick={() => openEdit(row)}
                           className="p-2 rounded-xl hover:bg-amber-soft text-amber-warm transition"
@@ -204,6 +206,7 @@ export default function CRUDPage({ title, endpoint, columns, formFields, extraAc
                       <div className="font-bold text-navy text-base truncate">{primaryVal}</div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
+                      {rowExtraActions && rowExtraActions(row, fetchData)}
                       <button
                         onClick={() => openEdit(row)}
                         className="p-2 rounded-xl bg-amber-soft text-amber-warm"

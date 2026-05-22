@@ -23,6 +23,10 @@ type User struct {
 	Active    bool           `json:"active" gorm:"default:true"`
 	SchoolID  *uint          `json:"school_id" gorm:"index"`
 	School    *School        `json:"school,omitempty" gorm:"foreignKey:SchoolID"`
+
+	// Password lifecycle
+	MustChangePassword bool       `json:"must_change_password" gorm:"default:false"`
+	PasswordChangedAt  *time.Time `json:"password_changed_at"`
 }
 
 type School struct {
@@ -429,6 +433,7 @@ func AutoMigrate(db *gorm.DB) {
 		&AttendanceSession{},
 		&Presence{},
 		&TeacherLocationLog{},
+		&PasswordResetLog{},
 		// Lain-lain
 		&Raport{},
 		&RaportItem{},

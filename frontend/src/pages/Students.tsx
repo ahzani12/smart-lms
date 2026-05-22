@@ -1,4 +1,5 @@
 import CRUDPage from '../components/CRUDPage'
+import ResetPasswordButton from '../components/ResetPasswordButton'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Upload, X } from 'lucide-react'
@@ -71,6 +72,14 @@ export default function Students() {
           { key: 'gender', label: 'Jenis Kelamin', type: 'select', options: [{ label: 'Laki-laki', value: 'L' }, { label: 'Perempuan', value: 'P' }] },
           { key: 'class_id', label: 'Kelas', type: 'select', options: classes.map(c => ({ label: c.name, value: c.id })) },
         ]}
+        rowExtraActions={(row) =>
+          row.user?.id ? (
+            <ResetPasswordButton
+              userId={row.user.id}
+              userName={row.user.name || 'Siswa'}
+            />
+          ) : null
+        }
         extraActions={
           <button
             onClick={() => setShowImport(true)}
@@ -128,7 +137,7 @@ export default function Students() {
               </div>
 
               <div className="bg-amber-soft/50 border border-warm rounded-2xl p-3 text-xs text-navy/70 leading-relaxed">
-                <span className="font-bold text-navy">Catatan:</span> Setiap siswa otomatis dapat ID 6 digit dan password default <code className="bg-white px-1.5 py-0.5 rounded font-mono text-amber-warm">siswa123</code>.
+                <span className="font-bold text-navy">Catatan:</span> Setiap siswa otomatis dapat ID 6 digit. Password default = <b>NIS</b> (atau ID Siswa kalau NIS kosong). Siswa wajib ganti password saat login pertama.
               </div>
             </div>
 

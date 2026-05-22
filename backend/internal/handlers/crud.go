@@ -59,10 +59,16 @@ func CreateStudent(c *fiber.Ctx) error {
 
 	studentID := generateStudentID()
 	sid := schoolID(c)
-	hash, _ := bcrypt.GenerateFromPassword([]byte("siswa123"), bcrypt.DefaultCost)
+	// Default password = NIS (req.NIS), fallback ke student_id auto-generated
+	defaultPwd := req.NIS
+	if defaultPwd == "" {
+		defaultPwd = studentID
+	}
+	hash, _ := bcrypt.GenerateFromPassword([]byte(defaultPwd), bcrypt.DefaultCost)
 	user := models.User{
 		Name: req.Name, StudentID: studentID, Password: string(hash),
 		Role: "siswa", Active: true, SchoolID: &sid,
+		MustChangePassword: true,
 	}
 	config.DB.Create(&user)
 
@@ -165,14 +171,23 @@ func CreateTeacher(c *fiber.Ctx) error {
 	}
 
 	sid := schoolID(c)
+	// Default password = NIP (req.NIP), atau custom kalau diberikan
 	pass := req.Password
+	defaultMode := false
 	if pass == "" {
-		pass = "guru123"
+		if req.NIP != "" {
+			pass = req.NIP
+			defaultMode = true
+		} else {
+			pass = "guru123"
+			defaultMode = true
+		}
 	}
 	hash, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	user := models.User{
 		Name: req.Name, Email: req.Email, Password: string(hash),
 		Role: "guru", Phone: req.Phone, Active: true, SchoolID: &sid,
+		MustChangePassword: defaultMode, // force change kalau pakai default kode
 	}
 	if err := config.DB.Create(&user).Error; err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Email sudah terdaftar"})

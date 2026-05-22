@@ -1,13 +1,22 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import axios from 'axios'
 
-interface User { id: number; name: string; email: string; role: string }
+interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+  must_change_password?: boolean
+  student_id?: string
+  school_id?: number
+}
 interface AuthCtx {
   user: User | null
   token: string | null
   loading: boolean
   login: (email: string, pass: string) => Promise<any>
   logout: () => void
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthCtx>(null!)
@@ -57,5 +66,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     delete axios.defaults.headers.common['Authorization']
   }
 
-  return <AuthContext.Provider value={{ user, token, loading, login, logout }}>{children}</AuthContext.Provider>
+  const refreshUser = async () => {
+    try {
+      const res = await axios.get('/api/auth/profile')
+      setUser(res.data.user ?? res.data)
+    } catch (err) {
+      // ignore
+    }
+  }
+
+  return <AuthContext.Provider value={{ user, token, loading, login, logout, refreshUser }}>{children}</AuthContext.Provider>
 }

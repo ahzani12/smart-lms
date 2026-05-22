@@ -21,6 +21,13 @@ export default function Login() {
     try {
       const user = await login(email, password)
       toast.success('Selamat datang!')
+
+      // Force change password kalau admin baru reset
+      if (user.must_change_password) {
+        navigate('/change-password?forced=true')
+        return
+      }
+
       navigate(user.role === 'superadmin' ? '/super' : '/')
     } catch {
       toast.error('Login gagal. Periksa kembali ID/NIP/Email dan password.')
