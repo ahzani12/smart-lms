@@ -31,6 +31,7 @@ export const navItems = [
   { to: '/ai-hub', icon: Sparkles, label: 'AI Hub', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
   { to: '/notifications', icon: Bell, label: 'Notifikasi WA', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/school-settings', icon: School, label: 'Pengaturan Sekolah', roles: ['admin_pusat'] },
+  { to: '/document-assets', icon: Stamp, label: 'Kop & TTD', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/location-settings', icon: MapPin, label: 'Lokasi & GPS', roles: ['admin_pusat'] },
   // Superadmin
   { to: '/super', icon: Shield, label: 'Overview', roles: ['superadmin'] },

@@ -172,6 +172,12 @@ func Setup(app *fiber.App) {
 	school.Get("/", handlers.GetSchool)
 	school.Put("/", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UpdateSchool)
 	school.Post("/logo", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UploadSchoolLogo)
+	// Asset dokumen (kop, stempel, TTD)
+	school.Get("/doc-assets", handlers.GetSchoolDocAssets)
+	school.Post("/doc-logo", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UploadLogoSekolah)
+	school.Post("/doc-stempel", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UploadStempel)
+	school.Post("/doc-ttd-kepala", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UploadTTDKepala)
+	school.Post("/doc-ttd-bendahara", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UploadTTDBendahara)
 	// Lokasi & anti fake-GPS
 	school.Get("/location", handlers.GetSchoolLocation)
 	school.Put("/location", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UpdateSchoolLocation)

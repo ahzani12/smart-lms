@@ -45,6 +45,20 @@ type School struct {
 	HeaderText  string         `json:"header_text" gorm:"type:text"` // custom raport text
 	HeaderColor string         `json:"header_color" gorm:"size:20;default:'#1e40af'"`
 
+	// ─── Identitas dokumen (kop & TTD) ─────────────────────────
+	LogoURL          string `json:"logo_url" gorm:"size:500"`           // logo sekolah utk kop dokumen (PNG transparan)
+	YayasanName      string `json:"yayasan_name" gorm:"size:255"`       // baris atas kop "YAYASAN ..."
+	Kabupaten        string `json:"kabupaten" gorm:"size:100"`          // utk kop & footer
+	KodePos          string `json:"kode_pos" gorm:"size:10"`
+	KepalaName       string `json:"kepala_name" gorm:"size:255"`        // nama kepsek utk TTD
+	KepalaNIP        string `json:"kepala_nip" gorm:"size:50"`
+	KepalaTTD        string `json:"kepala_ttd" gorm:"size:500"`         // file path TTD kepsek (PNG transparan)
+	BendaharaName    string `json:"bendahara_name" gorm:"size:255"`     // nama bendahara utk kuitansi
+	BendaharaNIP     string `json:"bendahara_nip" gorm:"size:50"`
+	BendaharaTTD     string `json:"bendahara_ttd" gorm:"size:500"`      // file path TTD bendahara
+	StempelURL       string `json:"stempel_url" gorm:"size:500"`        // stempel sekolah (PNG transparan)
+
+
 	// ─── Lokasi & anti fake-GPS (opsional, opt-in per sekolah) ───
 	Latitude            *float64 `json:"latitude" gorm:"type:double precision"`           // koordinat sekolah
 	Longitude           *float64 `json:"longitude" gorm:"type:double precision"`          // koordinat sekolah
