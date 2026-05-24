@@ -30,6 +30,9 @@ export const navItems = [
   { to: '/report-components', icon: Settings, label: 'Komponen Raport', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/ai-hub', icon: Sparkles, label: 'AI Hub', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
   { to: '/notifications', icon: Bell, label: 'Notifikasi WA', roles: ['admin_pusat', 'admin_cabang'] },
+  // Keuangan
+  { to: '/billing', icon: Wallet, label: 'Keuangan', roles: ['admin_pusat', 'admin_cabang'] },
+  { to: '/billing/tagihan', icon: Receipt, label: 'Tagihan', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/school-settings', icon: School, label: 'Pengaturan Sekolah', roles: ['admin_pusat'] },
   { to: '/document-assets', icon: Stamp, label: 'Kop & TTD', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/location-settings', icon: MapPin, label: 'Lokasi & GPS', roles: ['admin_pusat'] },

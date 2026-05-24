@@ -289,4 +289,30 @@ func Setup(app *fiber.App) {
 	notif.Get("/queue", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.ListNotifications)
 	notif.Post("/queue/:id/retry", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.RetryNotification)
 	notif.Delete("/queue/:id", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.DeleteNotification)
+
+	// ─── Keuangan / Billing ──────────────────────────────────────
+	billing := api.Group("/billing", middleware.AuthRequired)
+	adminOnly := middleware.RoleRequired("admin_pusat", "admin_cabang")
+
+	// Jenis tagihan (master)
+	billing.Get("/jenis", middleware.AuthRequired, handlers.GetJenisTagihan)
+	billing.Post("/jenis", adminOnly, handlers.CreateJenisTagihan)
+	billing.Put("/jenis/:id", adminOnly, handlers.UpdateJenisTagihan)
+	billing.Delete("/jenis/:id", adminOnly, handlers.DeleteJenisTagihan)
+
+	// Tagihan
+	billing.Post("/generate", adminOnly, handlers.GenerateTagihan)
+	billing.Get("/tagihan", handlers.GetTagihanList)
+	billing.Get("/tagihan/:id", handlers.GetTagihanDetail)
+	billing.Get("/siswa/:id", handlers.GetTagihanSiswa)
+	billing.Put("/tagihan/:id", adminOnly, handlers.UpdateTagihan)
+	billing.Delete("/tagihan/:id", adminOnly, handlers.CancelTagihan)
+
+	// Pembayaran
+	billing.Post("/bayar", adminOnly, handlers.CreatePembayaran)
+	billing.Post("/pembayaran/:id/void", adminOnly, handlers.VoidPembayaran)
+	billing.Get("/pembayaran/:id/kuitansi", handlers.PrintKuitansi)
+
+	// Dashboard
+	billing.Get("/dashboard", adminOnly, handlers.GetBillingDashboard)
 }

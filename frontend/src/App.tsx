@@ -20,6 +20,11 @@ import Calendar from './pages/Calendar'
 import AIHub from './pages/AIHub'
 import NotificationSettings from './pages/NotificationSettings'
 import DocumentAssets from './pages/DocumentAssets'
+import BillingDashboard from './pages/billing/BillingDashboard'
+import JenisTagihanPage from './pages/billing/JenisTagihanPage'
+import GenerateTagihan from './pages/billing/GenerateTagihan'
+import TagihanList from './pages/billing/TagihanList'
+import TagihanSiswa from './pages/billing/TagihanSiswa'
 import Leaderboard from './pages/Leaderboard'
 import Parents from './pages/Parents'
 import ReportComponents from './pages/ReportComponents'
@@ -91,6 +96,12 @@ export default function App() {
             <Route path="ai-hub" element={<AIHub />} />
             <Route path="notifications" element={<NotificationSettings />} />
             <Route path="document-assets" element={<DocumentAssets />} />
+            {/* Keuangan / Billing */}
+            <Route path="billing" element={<BillingDashboard />} />
+            <Route path="billing/jenis" element={<JenisTagihanPage />} />
+            <Route path="billing/generate" element={<GenerateTagihan />} />
+            <Route path="billing/tagihan" element={<TagihanList />} />
+            <Route path="billing/siswa/:id" element={<TagihanSiswa />} />
             {/* Superadmin */}
             <Route path="super" element={<SuperDashboard />} />
             <Route path="super/schools" element={<SuperSchools />} />

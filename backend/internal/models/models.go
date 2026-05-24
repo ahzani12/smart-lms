@@ -462,6 +462,10 @@ func AutoMigrate(db *gorm.DB) {
 		// Notifikasi WA/Telegram (opsional per sekolah)
 		&NotificationConfig{},
 		&NotificationQueue{},
+		// Keuangan (SPP, iuran, pembayaran)
+		&JenisTagihan{},
+		&Tagihan{},
+		&Pembayaran{},
 	)
 	if err != nil {
 		panic("Failed to migrate: " + err.Error())
