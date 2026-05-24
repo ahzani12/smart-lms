@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
 	"smart-lms/internal/config"
 	"smart-lms/internal/middleware"
 	"smart-lms/internal/models"
+	"smart-lms/internal/notifications"
 	"smart-lms/internal/routes"
 
 	"time"
@@ -103,6 +105,13 @@ func main() {
 
 	// API routes
 	routes.Setup(app)
+
+
+	// ─── Notification worker (background goroutine) ─────────────
+	// Poll queue tiap 30s, kirim notif WA/Telegram per sekolah.
+	// NoopNotifier dipakai kalau sekolah belum aktifkan (zero overhead).
+	notifWorker := notifications.NewWorker(config.DB)
+	notifWorker.Start(context.Background())
 
 	// Start server
 	port := os.Getenv("PORT")

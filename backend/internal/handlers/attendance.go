@@ -8,6 +8,7 @@ import (
 
 	"smart-lms/internal/config"
 	"smart-lms/internal/models"
+	"smart-lms/internal/notifications"
 	"smart-lms/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
@@ -382,9 +383,83 @@ func MarkPresenceManual(c *fiber.Ctx) error {
 			})
 		if res.RowsAffected > 0 {
 			updated++
+			// Trigger notif ortu untuk alfa / terlambat (opsional, sekolah aktifkan sendiri)
+			notifyAttendance(sess.SchoolID, it.StudentID, it.Status, it.LateMin)
 		}
 	}
 	return c.JSON(fiber.Map{"updated": updated, "total": len(req.Items)})
+}
+
+// notifyAttendance — kirim notif WA ke ortu kalau status=alfa atau terlambat.
+// No-op kalau:
+//   - Sekolah belum aktifkan notifikasi
+//   - Event "alfa"/"terlambat" toggle = false
+//   - Ortu belum punya phone/chat_id di ParentAccess
+//
+// Pattern: silent fail. Notifikasi bukan critical path absensi.
+func notifyAttendance(schoolID, studentID uint, status string, lateMin int) {
+	var event string
+	switch status {
+	case "alfa":
+		event = "alfa"
+	case "terlambat":
+		event = "terlambat"
+	default:
+		return // hadir/izin/sakit gak perlu notif
+	}
+
+	if !notifications.IsEventEnabled(config.DB, schoolID, event) {
+		return
+	}
+
+	// Ambil data siswa + ortu
+	var student models.Student
+	if err := config.DB.Preload("User").Preload("Class").First(&student, studentID).Error; err != nil {
+		return
+	}
+
+	// Cari ortu via ParentAccess (yang paling reliable — phone disimpan disitu)
+	var pa models.ParentAccess
+	if err := config.DB.Where("student_id = ? AND school_id = ?", studentID, schoolID).First(&pa).Error; err != nil || pa.Phone == "" {
+		return
+	}
+
+	tanggal := time.Now().Format("02 Jan 2006")
+	className := ""
+	if student.Class.ID > 0 {
+		className = student.Class.Name
+	}
+
+	var msg string
+	if event == "alfa" {
+		msg = "🔔 *Notifikasi Absensi*\n\n" +
+			"Yth. Bapak/Ibu Wali " + pa.ParentName + ",\n\n" +
+			"Putra/putri Anda *" + student.User.Name + "*"
+		if className != "" {
+			msg += " (" + className + ")"
+		}
+		msg += " hari ini *" + tanggal + "* tercatat *TIDAK HADIR (Alfa)*.\n\nMohon konfirmasi ke pihak sekolah."
+	} else {
+		msg = "⏰ *Notifikasi Keterlambatan*\n\n" +
+			"Yth. Bapak/Ibu Wali " + pa.ParentName + ",\n\n" +
+			"Putra/putri Anda *" + student.User.Name + "*"
+		if className != "" {
+			msg += " (" + className + ")"
+		}
+		msg += " hari ini *" + tanggal + "* terlambat masuk sekolah"
+		if lateMin > 0 {
+			msg += " (" + fmt.Sprintf("%d menit", lateMin) + ")"
+		}
+		msg += "."
+	}
+
+	_, _ = notifications.Enqueue(config.DB, notifications.Outbox{
+		SchoolID:  schoolID,
+		Event:     event,
+		Recipient: pa.Phone,
+		StudentID: &studentID,
+		Message:   msg,
+	})
 }
 
 // Siswa scan QR — self-mark hadir

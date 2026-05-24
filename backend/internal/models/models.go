@@ -445,6 +445,9 @@ func AutoMigrate(db *gorm.DB) {
 		&ParentAccess{},
 		&ReportComponent{},
 		&StudentScore{},
+		// Notifikasi WA/Telegram (opsional per sekolah)
+		&NotificationConfig{},
+		&NotificationQueue{},
 	)
 	if err != nil {
 		panic("Failed to migrate: " + err.Error())

@@ -18,6 +18,7 @@ import Schedules from './pages/Schedules'
 import Raport from './pages/Raport'
 import Calendar from './pages/Calendar'
 import AIHub from './pages/AIHub'
+import NotificationSettings from './pages/NotificationSettings'
 import Leaderboard from './pages/Leaderboard'
 import Parents from './pages/Parents'
 import ReportComponents from './pages/ReportComponents'
@@ -87,6 +88,7 @@ export default function App() {
             <Route path="input-scores" element={<InputScores />} />
             <Route path="generate-raport" element={<GenerateRaport />} />
             <Route path="ai-hub" element={<AIHub />} />
+            <Route path="notifications" element={<NotificationSettings />} />
             {/* Superadmin */}
             <Route path="super" element={<SuperDashboard />} />
             <Route path="super/schools" element={<SuperSchools />} />

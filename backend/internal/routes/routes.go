@@ -274,4 +274,13 @@ func Setup(app *fiber.App) {
 	super.Get("/ai-quotas", handlers.SuperGetAIQuotas)
 	super.Post("/ai-quotas", handlers.SuperSetAIQuota)
 	super.Post("/ai-quotas/:id/reset", handlers.SuperResetQuota)
+
+	// ─── Notifikasi WA/Telegram (per-sekolah, opsional) ─────────
+	notif := api.Group("/notifications", middleware.AuthRequired)
+	notif.Get("/config", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.GetNotificationConfig)
+	notif.Put("/config", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.UpsertNotificationConfig)
+	notif.Post("/test", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.TestNotification)
+	notif.Get("/queue", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.ListNotifications)
+	notif.Post("/queue/:id/retry", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.RetryNotification)
+	notif.Delete("/queue/:id", middleware.RoleRequired("admin_pusat", "admin_cabang"), handlers.DeleteNotification)
 }
