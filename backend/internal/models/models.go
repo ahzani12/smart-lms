@@ -177,6 +177,8 @@ type Question struct {
 	Content        string         `json:"content" gorm:"type:text;not null"`
 	Options        string         `json:"options" gorm:"type:jsonb"`   // JSON: [{"key":"A","text":"..."}, ...]
 	Answer         string         `json:"answer" gorm:"type:text"`     // jawaban benar (utk multi-answer: CSV "A,C")
+	AcceptedAnswers string        `json:"accepted_answers" gorm:"type:text"` // isian: alternatif jawaban (newline-separated, case-insensitive)
+	Keywords       string         `json:"keywords" gorm:"type:text"`   // essay: kata kunci (newline-separated, untuk auto-correct keyword scoring)
 	Explanation    string         `json:"explanation" gorm:"type:text"`
 	Difficulty     string         `json:"difficulty" gorm:"size:20;default:'sedang'"`
 	Points         int            `json:"points" gorm:"default:10"`

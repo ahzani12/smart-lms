@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 	"math"
-	"strings"
 	"time"
 
 	"smart-lms/internal/config"
@@ -440,27 +439,25 @@ func autoGradeAttempt(attemptID uint) {
 
 		totalPoints += float64(question.Points)
 
-		if question.Type == "pilihan_ganda" || question.Type == "true_false" {
-			correct := strings.EqualFold(strings.TrimSpace(ans.Answer), strings.TrimSpace(question.Answer))
-			if correct {
-				score := float64(question.Points)
-				ans.IsCorrect = &correct
-				ans.Score = &score
-				totalScore += score
-				config.DB.Model(&question).Updates(map[string]interface{}{
-					"correct_count":  gorm.Expr("correct_count + 1"),
-					"total_attempts": gorm.Expr("total_attempts + 1"),
-				})
-			} else {
-				f := false
-				ans.IsCorrect = &f
-				zero := float64(0)
-				ans.Score = &zero
-				config.DB.Model(&question).Update("total_attempts", gorm.Expr("total_attempts + 1"))
-			}
-			config.DB.Save(&ans)
+		score, correct, graded := scoreAnswer(question, ans.Answer)
+		if !graded {
+			continue // essay tanpa keyword → manual grading
 		}
-		// Essay questions need AI grading - handled separately
+
+		ans.IsCorrect = &correct
+		ans.Score = &score
+		totalScore += score
+
+		// Update item statistics
+		if correct {
+			config.DB.Model(&question).Updates(map[string]interface{}{
+				"correct_count":  gorm.Expr("correct_count + 1"),
+				"total_attempts": gorm.Expr("total_attempts + 1"),
+			})
+		} else {
+			config.DB.Model(&question).Update("total_attempts", gorm.Expr("total_attempts + 1"))
+		}
+		config.DB.Save(&ans)
 	}
 
 	if totalPoints > 0 {

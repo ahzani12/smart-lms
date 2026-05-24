@@ -88,6 +88,7 @@ func Setup(app *fiber.App) {
 
 	// ─── Question Banks ────────────────────────────────
 	banks := api.Group("/question-banks", middleware.AuthRequired)
+	banks.Get("/template-docx", handlers.DownloadQuestionTemplate) // sebelum /:id
 	banks.Get("/", handlers.GetQuestionBanks)
 	banks.Get("/:id", handlers.GetQuestionBank)
 	banks.Post("/", middleware.RoleRequired("guru", "admin_pusat"), handlers.CreateQuestionBank)
@@ -99,6 +100,10 @@ func Setup(app *fiber.App) {
 	banks.Post("/:id/items", middleware.RoleRequired("guru", "admin_pusat"), handlers.AddBankItems)
 	banks.Delete("/:id/items/:item_id", middleware.RoleRequired("guru", "admin_pusat"), handlers.RemoveBankItem)
 	banks.Put("/:id/items/reorder", middleware.RoleRequired("guru", "admin_pusat"), handlers.ReorderBankItems)
+
+	// Import dari Word (.docx)
+	banks.Post("/:id/import-docx-preview", middleware.RoleRequired("guru", "admin_pusat"), handlers.ImportDocxPreview)
+	banks.Post("/:id/import-docx-commit", middleware.RoleRequired("guru", "admin_pusat"), handlers.ImportDocxCommit)
 
 	// Import Word → bank
 	banks.Post("/:bank_id/import-word", middleware.RoleRequired("guru", "admin_pusat"), handlers.ImportQuestionsFromWord)

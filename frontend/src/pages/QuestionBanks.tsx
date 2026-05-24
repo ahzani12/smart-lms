@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import {
   Plus, Search, Trash2, Loader2, X, ArrowLeft, BookOpen, Layers,
   ChevronRight, ChevronDown, Check, Filter, Edit2,
+  FileDown, FileUp, AlertCircle,
 } from 'lucide-react'
 
 type View = 'list' | 'detail'
@@ -223,6 +224,7 @@ function BankDetail({ bankId, subjects, onBack }: { bankId: number; subjects: Su
   const [showPicker, setShowPicker] = useState(false)
   const [showQEdit, setShowQEdit] = useState(false)
   const [editQ, setEditQ] = useState<Question | null>(null)
+  const [showImport, setShowImport] = useState(false)
 
   const load = async () => {
     setLoading(true)
@@ -258,6 +260,17 @@ function BankDetail({ bankId, subjects, onBack }: { bankId: number; subjects: Su
         <button onClick={() => { setEditQ(null); setShowQEdit(true) }}
           className="px-4 py-2 bg-white border border-warm/60 text-navy/80 rounded-xl hover:bg-cream-soft flex items-center gap-2">
           <Plus className="w-4 h-4" /> Soal Baru
+        </button>
+        <a
+          href="/api/question-banks/template-docx"
+          className="px-4 py-2 bg-white border border-warm/60 text-navy/80 rounded-xl hover:bg-cream-soft flex items-center gap-2"
+          title="Download template Word untuk diisi soal"
+        >
+          <FileDown className="w-4 h-4" /> Template
+        </a>
+        <button onClick={() => setShowImport(true)}
+          className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 flex items-center gap-2">
+          <FileUp className="w-4 h-4" /> Import Word
         </button>
         <button onClick={() => setShowPicker(true)}
           className="px-4 py-2 gradient-warm text-white rounded-xl hover:bg-amber-warm flex items-center gap-2">
@@ -324,6 +337,15 @@ function BankDetail({ bankId, subjects, onBack }: { bankId: number; subjects: Su
           subjects={subjects}
           onClose={() => setShowQEdit(false)}
           onSaved={() => { setShowQEdit(false); load() }}
+        />
+      )}
+
+      {showImport && (
+        <ImportDocxModal
+          bankId={bankId}
+          bankTitle={bank.title}
+          onClose={() => setShowImport(false)}
+          onDone={() => { setShowImport(false); load() }}
         />
       )}
     </div>
@@ -773,6 +795,263 @@ function QuestionEditor({ bankId, subjectId, level, question, onClose, onSaved }
             {question ? 'Update' : 'Simpan'}
           </button>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════
+// IMPORT DOCX MODAL — preview + commit
+// ════════════════════════════════════════════════════════════════
+
+interface ParsedQ {
+  number: number
+  type: string
+  difficulty: string
+  points: number
+  content: string
+  options?: { key: string; text: string }[]
+  answer: string
+  explanation?: string
+  accepted_answers?: string
+  keywords?: string
+  errors?: string[]
+}
+
+const TYPE_LABEL: Record<string, string> = {
+  pilihan_ganda: 'Pilihan Ganda',
+  essay: 'Essay',
+  true_false: 'Benar/Salah',
+  fill_blank: 'Isian',
+}
+
+const DIFF_BADGE: Record<string, string> = {
+  mudah: 'bg-emerald-100 text-emerald-700',
+  sedang: 'bg-amber-soft/60 text-amber-warm',
+  sulit: 'bg-rose-100 text-rose-700',
+}
+
+function ImportDocxModal({ bankId, bankTitle, onClose, onDone }: {
+  bankId: number
+  bankTitle: string
+  onClose: () => void
+  onDone: () => void
+}) {
+  const [file, setFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [committing, setCommitting] = useState(false)
+  const [preview, setPreview] = useState<ParsedQ[] | null>(null)
+  const [stats, setStats] = useState<{ total: number; valid: number; with_errors: number } | null>(null)
+
+  const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    if (!f) return
+    if (!f.name.toLowerCase().endsWith('.docx')) {
+      toast.error('File harus .docx')
+      return
+    }
+    setFile(f)
+    setPreview(null)
+    setStats(null)
+  }
+
+  const doPreview = async () => {
+    if (!file) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await axios.post(
+        `/api/question-banks/${bankId}/import-docx-preview`,
+        fd,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+      setPreview(res.data.questions || [])
+      setStats({ total: res.data.total, valid: res.data.valid, with_errors: res.data.with_errors })
+      if ((res.data.valid || 0) === 0) {
+        toast.error('Semua soal punya error. Cek detail di bawah.')
+      } else {
+        toast.success(`${res.data.valid} dari ${res.data.total} soal valid`)
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Gagal parse file')
+    }
+    setUploading(false)
+  }
+
+  const doCommit = async () => {
+    if (!preview) return
+    const valid = preview.filter(q => !q.errors || q.errors.length === 0)
+    if (valid.length === 0) {
+      toast.error('Tidak ada soal valid untuk disimpan')
+      return
+    }
+    setCommitting(true)
+    try {
+      const res = await axios.post(`/api/question-banks/${bankId}/import-docx-commit`, {
+        questions: preview,
+      })
+      toast.success(res.data.message || `${res.data.created} soal disimpan`)
+      onDone()
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Commit gagal')
+    }
+    setCommitting(false)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-warm/40 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-navy flex items-center gap-2">
+              <FileUp className="w-5 h-5 text-emerald-600" /> Import Soal dari Word
+            </h2>
+            <div className="text-sm text-navy/60">Bank: {bankTitle}</div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-cream-soft rounded-lg">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {!preview && (
+            <>
+              <div className="bg-amber-soft/30 border border-warm/40 rounded-xl p-4 text-sm text-navy/70">
+                <div className="font-semibold mb-1">Cara pakai:</div>
+                <ol className="list-decimal pl-5 space-y-1">
+                  <li>Download <a href="/api/question-banks/template-docx" className="text-emerald-600 underline">template Word</a> kalau belum punya.</li>
+                  <li>Edit di MS Word / Google Docs / LibreOffice. Tambah / hapus blok <code className="bg-white px-1 rounded">=== SOAL N ===</code>.</li>
+                  <li>Save sebagai <strong>.docx</strong>, lalu upload di sini.</li>
+                  <li>Preview soal yang ke-parse, fix error kalau ada, lalu Simpan.</li>
+                </ol>
+              </div>
+
+              <label className="block">
+                <div className="text-sm font-medium text-navy/80 mb-2">File .docx</div>
+                <input
+                  type="file"
+                  accept=".docx"
+                  onChange={onPickFile}
+                  className="block w-full text-sm text-navy/70 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-600 file:text-white file:cursor-pointer hover:file:bg-emerald-700"
+                />
+              </label>
+
+              {file && (
+                <div className="bg-cream-soft border border-warm/40 rounded-xl p-3 flex items-center justify-between text-sm">
+                  <span>📄 {file.name} ({(file.size / 1024).toFixed(1)} KB)</span>
+                  <button onClick={() => setFile(null)} className="text-rose-600 hover:underline">Hapus</button>
+                </div>
+              )}
+
+              <button
+                onClick={doPreview}
+                disabled={!file || uploading}
+                className="w-full bg-emerald-600 text-white px-6 py-3 rounded-xl hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+              >
+                {uploading ? <><Loader2 className="w-5 h-5 animate-spin" /> Parsing...</> : <><FileUp className="w-5 h-5" /> Preview Soal</>}
+              </button>
+            </>
+          )}
+
+          {preview && stats && (
+            <>
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-cream-soft border border-warm/40 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-navy">{stats.total}</div>
+                  <div className="text-xs text-navy/60">Total Soal</div>
+                </div>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-emerald-700">{stats.valid}</div>
+                  <div className="text-xs text-emerald-700">Valid</div>
+                </div>
+                <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-rose-700">{stats.with_errors}</div>
+                  <div className="text-xs text-rose-700">Ada Error</div>
+                </div>
+              </div>
+
+              {/* Question list */}
+              <div className="space-y-2">
+                {preview.map((q, idx) => (
+                  <div
+                    key={idx}
+                    className={`border rounded-xl p-3 ${q.errors?.length ? 'border-rose-300 bg-rose-50/40' : 'border-warm/40 bg-white'}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-none w-8 h-8 rounded-lg bg-cream-soft text-navy/70 font-semibold flex items-center justify-center text-sm">
+                        {q.number}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap text-xs">
+                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded">
+                            {TYPE_LABEL[q.type] || q.type || '?'}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded ${DIFF_BADGE[q.difficulty] || 'bg-amber-soft/40'}`}>
+                            {q.difficulty}
+                          </span>
+                          <span className="text-navy/40">{q.points} poin</span>
+                        </div>
+                        <div className="text-sm text-navy mb-1 line-clamp-2">{q.content}</div>
+                        {q.options && q.options.length > 0 && (
+                          <div className="text-xs text-navy/60 grid grid-cols-2 gap-1 mt-1">
+                            {q.options.map(o => (
+                              <div key={o.key}>
+                                <span className="font-mono">{o.key}.</span> {o.text}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="text-xs text-navy/60 mt-1">
+                          <span className="font-medium">Jawaban:</span> {q.answer || <em className="text-rose-500">kosong</em>}
+                        </div>
+                        {q.keywords && (
+                          <div className="text-xs text-navy/60">
+                            <span className="font-medium">Kata kunci:</span> {q.keywords.split('\n').join(', ')}
+                          </div>
+                        )}
+                        {q.accepted_answers && (
+                          <div className="text-xs text-navy/60">
+                            <span className="font-medium">Alternatif:</span> {q.accepted_answers.split('\n').join(', ')}
+                          </div>
+                        )}
+                        {q.errors && q.errors.length > 0 && (
+                          <div className="mt-2 flex items-start gap-1.5 text-xs text-rose-700 bg-white border border-rose-200 rounded p-2">
+                            <AlertCircle className="w-3.5 h-3.5 flex-none mt-0.5" />
+                            <div>{q.errors.join(' • ')}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        {preview && (
+          <div className="px-6 py-4 border-t border-warm/40 flex items-center justify-between gap-3">
+            <button
+              onClick={() => { setPreview(null); setStats(null); setFile(null) }}
+              className="px-4 py-2 text-navy/70 hover:bg-cream-soft rounded-xl"
+            >
+              ← Upload ulang
+            </button>
+            <button
+              onClick={doCommit}
+              disabled={committing || (stats?.valid || 0) === 0}
+              className="px-6 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold"
+            >
+              {committing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+              Simpan {stats?.valid || 0} Soal
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
