@@ -36,6 +36,11 @@ func main() {
 	// Seed default data
 	models.SeedData(config.DB)
 
+	// Demo data — opt-in via env: SEED_DEMO=1
+	if os.Getenv("SEED_DEMO") == "1" {
+		models.SeedDemo(config.DB)
+	}
+
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
 		AppName:      "Smart LMS",
