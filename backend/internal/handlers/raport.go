@@ -419,7 +419,7 @@ func DownloadRaportClass(c *fiber.Ctx) error {
 	if sid > 0 {
 		rq = rq.Where("raports.school_id = ?", sid)
 	}
-	rq.Preload("Student.User").Preload("Student.Class").Preload("Semester").
+	rq.Preload("Student.User").Preload("Student.Class").Preload("Student.Class.Teacher.User").Preload("Semester").
 		Preload("Items.Subject").Preload("Items.Teacher.User").
 		Find(&raports)
 
@@ -432,13 +432,32 @@ func DownloadRaportClass(c *fiber.Ctx) error {
 	os.MkdirAll(tmpDir, 0755)
 	defer os.RemoveAll(tmpDir)
 
-	// Logo path
+	// Logo path — prioritize new logo_url, fallback ke header_logo lama
 	logoPath := ""
-	if school.HeaderLogo != "" {
-		// Convert relative path to absolute
-		absLogo := "/root/smart-lms/backend" + school.HeaderLogo
+	logoCandidate := school.LogoURL
+	if logoCandidate == "" {
+		logoCandidate = school.HeaderLogo
+	}
+	if logoCandidate != "" {
+		absLogo := "/root/smart-lms/backend" + logoCandidate
 		if _, err := os.Stat(absLogo); err == nil {
 			logoPath = absLogo
+		}
+	}
+
+	// Stempel & TTD Kepsek (untuk signature block raport)
+	stempelPath := ""
+	if school.StempelURL != "" {
+		abs := "/root/smart-lms/backend" + school.StempelURL
+		if _, err := os.Stat(abs); err == nil {
+			stempelPath = abs
+		}
+	}
+	ttdKepsekPath := ""
+	if school.KepalaTTD != "" {
+		abs := "/root/smart-lms/backend" + school.KepalaTTD
+		if _, err := os.Stat(abs); err == nil {
+			ttdKepsekPath = abs
 		}
 	}
 
@@ -451,8 +470,7 @@ func DownloadRaportClass(c *fiber.Ctx) error {
 		}
 
 		// Build HTML
-		html := buildRaportHTML(raport, school, semester, logoPath)
-
+		html := buildRaportHTML(raport, school, semester, logoPath, stempelPath, ttdKepsekPath)
 		// Write HTML to temp file
 		htmlFile := fmt.Sprintf("%s/%s.html", tmpDir, sanitizeFilename(studentName))
 		os.WriteFile(htmlFile, []byte(html), 0644)
@@ -512,12 +530,22 @@ func sanitizeFilename(name string) string {
 	return result
 }
 
-func buildRaportHTML(raport models.Raport, school models.School, semester models.Semester, logoPath string) string {
+func buildRaportHTML(raport models.Raport, school models.School, semester models.Semester, logoPath, stempelPath, ttdKepsekPath string) string {
 	items := raport.Items
 	studentName := raport.Student.User.Name
 	className := ""
+	waliName := ""
+	waliNIP := ""
 	if raport.Student.Class.Name != "" {
 		className = raport.Student.Class.Name
+	}
+	if raport.Student.Class.Teacher != nil {
+		if raport.Student.Class.Teacher.User.Name != "" {
+			waliName = raport.Student.Class.Teacher.User.Name
+		}
+		if raport.Student.Class.Teacher.NIP != "" {
+			waliNIP = raport.Student.Class.Teacher.NIP
+		}
 	}
 
 	// Calculate average
@@ -584,6 +612,13 @@ table.nilai td.c { text-align: center; }
 table.nilai td.no { width: 35px; text-align: center; }
 table.nilai tfoot td { font-weight: bold; }
 .catatan { border: 1px solid #000; padding: 10px; min-height: 50px; margin-bottom: 20px; font-style: italic; }
+.signatures { display: flex; justify-content: space-between; margin-top: 30px; gap: 20px; }
+.sig-block { text-align: center; flex: 1; font-size: 10pt; }
+.sig-img-wrap { position: relative; height: 90px; margin: 6px auto 4px; display: flex; align-items: center; justify-content: center; }
+.sig-ttd { max-height: 80px; max-width: 140px; object-fit: contain; position: relative; z-index: 2; }
+.sig-stempel { position: absolute; max-height: 95px; max-width: 95px; object-fit: contain; opacity: 0.85; z-index: 1; left: 50%%; transform: translateX(-65%%); top: -2px; }
+.sig-name { font-weight: bold; text-decoration: underline; padding-top: 2px; }
+.sig-nip { font-size: 9pt; }
 </style></head><body>
 
 <div class="kop">
@@ -619,6 +654,8 @@ table.nilai tfoot td { font-weight: bold; }
 
 <div class="catatan">%s</div>
 
+%s
+
 </body></html>`,
 		studentName,
 		logoTag,
@@ -636,9 +673,82 @@ table.nilai tfoot td { font-weight: bold; }
 		itemsHTML,
 		avgScore,
 		raportNotes(raport.Notes),
+		buildSignatureBlock(school, semester, stempelPath, ttdKepsekPath, className, waliName, waliNIP),
 	)
 
 	return html
+}
+
+// buildSignatureBlock — 3 kolom: wali murid + wali kelas + kepsek
+func buildSignatureBlock(school models.School, semester models.Semester, stempelPath, ttdKepsekPath, className, waliName, waliNIP string) string {
+	// Kota & tanggal
+	tgl := time.Now().Format("2 January 2006")
+	if !semester.EndDate.IsZero() {
+		tgl = semester.EndDate.Format("2 January 2006")
+	}
+	kota := school.Kabupaten
+	prefixKota := ""
+	if kota != "" {
+		prefixKota = kota + ", "
+	}
+
+	// Default kalau wali kelas belum di-assign
+	if waliName == "" {
+		waliName = "_______________"
+	}
+
+	// Kepsek
+	kepsekName := school.KepalaName
+	if kepsekName == "" {
+		kepsekName = "_______________"
+	}
+	kepsekNIP := ""
+	if school.KepalaNIP != "" {
+		kepsekNIP = "NIP. " + school.KepalaNIP
+	}
+
+	// Image tags
+	stempelImg := ""
+	if stempelPath != "" {
+		stempelImg = fmt.Sprintf(`<img src="file://%s" class="sig-stempel" />`, stempelPath)
+	}
+	ttdImg := ""
+	if ttdKepsekPath != "" {
+		ttdImg = fmt.Sprintf(`<img src="file://%s" class="sig-ttd" />`, ttdKepsekPath)
+	}
+
+	waliNIPLine := ""
+	if waliNIP != "" {
+		waliNIPLine = fmt.Sprintf(`<div class="sig-nip">NIP. %s</div>`, waliNIP)
+	}
+	kepsekNIPLine := ""
+	if kepsekNIP != "" {
+		kepsekNIPLine = fmt.Sprintf(`<div class="sig-nip">%s</div>`, kepsekNIP)
+	}
+
+	return fmt.Sprintf(`<div class="signatures">
+  <div class="sig-block">
+    <div>Mengetahui,<br>Orang Tua / Wali Murid</div>
+    <div class="sig-img-wrap"></div>
+    <div class="sig-name">_______________</div>
+    <div class="sig-nip">&nbsp;</div>
+  </div>
+  <div class="sig-block">
+    <div>Wali Kelas %s</div>
+    <div class="sig-img-wrap"></div>
+    <div class="sig-name">%s</div>
+    %s
+  </div>
+  <div class="sig-block">
+    <div>%s%s<br>Kepala Sekolah</div>
+    <div class="sig-img-wrap">%s%s</div>
+    <div class="sig-name">%s</div>
+    %s
+  </div>
+</div>`,
+		className, waliName, waliNIPLine,
+		prefixKota, tgl, stempelImg, ttdImg, kepsekName, kepsekNIPLine,
+	)
 }
 
 func buildKontak(school models.School) string {
