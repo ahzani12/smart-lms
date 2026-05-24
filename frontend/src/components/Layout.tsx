@@ -6,7 +6,7 @@ import {
   BookOpen, ClipboardCheck, GraduationCap, Calendar, Sparkles,
   LogOut, Menu, X, ChevronDown, CalendarClock, Trophy, Heart,
   Settings, ClipboardEdit, FileText, Key, School, Shield, MapPin,
-  Bell, Search, Plus,
+  Bell, Search, Plus, Wallet, Receipt, Stamp,
 } from 'lucide-react'
 
 export const navItems = [

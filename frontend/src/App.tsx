@@ -40,6 +40,8 @@ import SuperDashboard from './pages/super/SuperDashboard'
 import SuperSchools from './pages/super/SuperSchools'
 import SuperAdmins from './pages/super/SuperAdmins'
 import SuperAIConfig from './pages/super/SuperAIConfig'
+import LandingPage from './pages/LandingPage'
+import PricingPage from './pages/PricingPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -61,17 +63,48 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+// RootGate: render LandingPage publik kalau belum login, render Layout (app)
+// kalau sudah login. Path "/" smart-detects auth state. Sub-paths (students,
+// attendance, dll) di-protect via ProtectedRoute wrapper.
+function RootGate() {
+  const { user, loading } = useAuth()
+  const location = useLocation()
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+      </div>
+    )
+  }
+  // Root path: belum login → landing, sudah login → app dashboard
+  if (location.pathname === '/') {
+    return user ? <Layout /> : <LandingPage />
+  }
+  // Sub-paths require auth
+  if (!user) return <Navigate to="/login" />
+  if ((user as any).must_change_password && location.pathname !== '/change-password') {
+    return <Navigate to="/change-password?forced=true" replace />
+  }
+  return <Layout />
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
+          {/* Public marketing pages */}
+          <Route path="/pricing" element={<PricingPage />} />
+
+          {/* Auth */}
           <Route path="/login" element={<Login />} />
           <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
           <Route path="/parent-login" element={<ParentLogin />} />
           <Route path="/exams/:id/take" element={<ProtectedRoute><ExamTake /></ProtectedRoute>} />
-          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+
+          {/* Root: smart-gate (landing kalau belum login, app kalau sudah) */}
+          <Route path="/" element={<RootGate />}>
             <Route index element={<Dashboard />} />
             <Route path="students" element={<Students />} />
             <Route path="teachers" element={<Teachers />} />
