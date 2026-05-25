@@ -450,6 +450,7 @@ func AutoMigrate(db *gorm.DB) {
 		&Presence{},
 		&TeacherLocationLog{},
 		&PasswordResetLog{},
+		&AssistantLog{},
 		// Lain-lain
 		&Raport{},
 		&RaportItem{},

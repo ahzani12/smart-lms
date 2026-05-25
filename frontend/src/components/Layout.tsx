@@ -6,11 +6,12 @@ import {
   BookOpen, ClipboardCheck, GraduationCap, Calendar, Sparkles,
   LogOut, Menu, X, ChevronDown, CalendarClock, Trophy, Heart,
   Settings, ClipboardEdit, FileText, Key, School, Shield, MapPin,
-  Bell, Search, Plus, Wallet, Receipt, Stamp,
+  Bell, Search, Plus, Wallet, Receipt, Stamp, MessageSquare,
 } from 'lucide-react'
 
 export const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin_pusat', 'admin_cabang', 'guru', 'siswa'] },
+  { to: '/asisten', icon: MessageSquare, label: 'Asisten', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
   { to: '/students', icon: Users, label: 'Siswa', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
   { to: '/teachers', icon: UserCircle, label: 'Guru', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/classes', icon: Building2, label: 'Kelas', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
@@ -82,8 +83,8 @@ export default function Layout() {
   // Mobile FAB quick actions (top 4 from sidebar that aren't in bottom nav)
   const fabActions = [
     { to: '/attendance', icon: ClipboardCheck, label: 'Absensi' },
+    { to: '/asisten', icon: MessageSquare, label: 'Asisten' },
     { to: '/input-scores', icon: ClipboardEdit, label: 'Input Nilai' },
-    { to: '/calendar', icon: Calendar, label: 'Kalender' },
     { to: '/ai-hub', icon: Sparkles, label: 'AI Hub' },
   ]
 

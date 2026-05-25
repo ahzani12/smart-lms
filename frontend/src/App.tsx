@@ -18,6 +18,7 @@ import Schedules from './pages/Schedules'
 import Raport from './pages/Raport'
 import Calendar from './pages/Calendar'
 import AIHub from './pages/AIHub'
+import Asisten from './pages/Asisten'
 import NotificationSettings from './pages/NotificationSettings'
 import DocumentAssets from './pages/DocumentAssets'
 import BillingDashboard from './pages/billing/BillingDashboard'
@@ -127,6 +128,7 @@ export default function App() {
             <Route path="input-scores" element={<InputScores />} />
             <Route path="generate-raport" element={<GenerateRaport />} />
             <Route path="ai-hub" element={<AIHub />} />
+            <Route path="asisten" element={<Asisten />} />
             <Route path="notifications" element={<NotificationSettings />} />
             <Route path="document-assets" element={<DocumentAssets />} />
             {/* Keuangan / Billing */}

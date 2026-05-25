@@ -163,6 +163,14 @@ func Setup(app *fiber.App) {
 	attendance.Get("/summary", handlers.GetAttendanceSummary)
 	attendance.Get("/teacher-summary", handlers.GetTeacherAttendanceSummary)
 
+	// ─── Asisten (Rule-based command parser) ───────────
+	asisten := api.Group("/assistant", middleware.AuthRequired)
+	asisten.Post("/parse", handlers.AssistantParse)
+	asisten.Post("/resolve", handlers.AssistantResolve)
+	asisten.Post("/execute", middleware.RoleRequired("guru", "admin_pusat", "admin_cabang", "wali_kelas"), handlers.AssistantExecute)
+	asisten.Post("/undo", middleware.RoleRequired("guru", "admin_pusat", "admin_cabang", "wali_kelas"), handlers.AssistantUndo)
+	asisten.Get("/log", handlers.AssistantGetLog)
+
 	// ─── Raport ────────────────────────────────────────
 	raport := api.Group("/raport", middleware.AuthRequired)
 	raport.Get("/", handlers.GetRaports)
