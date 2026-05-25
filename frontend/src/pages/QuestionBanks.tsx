@@ -261,13 +261,22 @@ function BankDetail({ bankId, subjects, onBack }: { bankId: number; subjects: Su
           className="px-4 py-2 bg-white border border-warm/60 text-navy/80 rounded-xl hover:bg-cream-soft flex items-center gap-2">
           <Plus className="w-4 h-4" /> Soal Baru
         </button>
-        <a
-          href="/api/question-banks/template-docx"
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              const res = await axios.get('/api/question-banks/template-docx', { responseType: 'blob' })
+              const url = URL.createObjectURL(res.data)
+              const a = document.createElement('a')
+              a.href = url; a.download = 'template-soal.docx'; a.click()
+              URL.revokeObjectURL(url)
+            } catch { toast.error('Gagal download template') }
+          }}
           className="px-4 py-2 bg-white border border-warm/60 text-navy/80 rounded-xl hover:bg-cream-soft flex items-center gap-2"
           title="Download template Word untuk diisi soal"
         >
           <FileDown className="w-4 h-4" /> Template
-        </a>
+        </button>
         <button onClick={() => setShowImport(true)}
           className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 flex items-center gap-2">
           <FileUp className="w-4 h-4" /> Import Word
@@ -922,7 +931,15 @@ function ImportDocxModal({ bankId, bankTitle, onClose, onDone }: {
               <div className="bg-amber-soft/30 border border-warm/40 rounded-xl p-4 text-sm text-navy/70">
                 <div className="font-semibold mb-1">Cara pakai:</div>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>Download <a href="/api/question-banks/template-docx" className="text-emerald-600 underline">template Word</a> kalau belum punya.</li>
+                  <li>Download <button type="button" onClick={async () => {
+                    try {
+                      const res = await axios.get('/api/question-banks/template-docx', { responseType: 'blob' })
+                      const url = URL.createObjectURL(res.data)
+                      const a = document.createElement('a')
+                      a.href = url; a.download = 'template-soal.docx'; a.click()
+                      URL.revokeObjectURL(url)
+                    } catch { toast.error('Gagal download template') }
+                  }} className="text-emerald-600 underline">template Word</button> kalau belum punya.</li>
                   <li>Edit di MS Word / Google Docs / LibreOffice. Tambah / hapus blok <code className="bg-white px-1 rounded">=== SOAL N ===</code>.</li>
                   <li>Save sebagai <strong>.docx</strong>, lalu upload di sini.</li>
                   <li>Preview soal yang ke-parse, fix error kalau ada, lalu Simpan.</li>
