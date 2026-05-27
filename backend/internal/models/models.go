@@ -469,6 +469,8 @@ func AutoMigrate(db *gorm.DB) {
 		&JenisTagihan{},
 		&Tagihan{},
 		&Pembayaran{},
+		&Potongan{},
+		&StudentPotongan{},
 	)
 	if err != nil {
 		panic("Failed to migrate: " + err.Error())

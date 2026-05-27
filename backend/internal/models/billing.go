@@ -16,6 +16,7 @@ type JenisTagihan struct {
 	Deskripsi      string         `json:"deskripsi"`                       // optional
 	NominalDefault float64        `json:"nominal_default" gorm:"not null"` // default nominal saat generate
 	Periode        string         `json:"periode" gorm:"not null"`         // "bulanan" | "sekali" | "tahunan"
+	ApplyPotongan  bool           `json:"apply_potongan" gorm:"default:false"` // true = saat generate, auto kurangi keringanan dari potongan siswa
 	Aktif          bool           `json:"aktif" gorm:"default:true"`
 	CreatedAt      time.Time      `json:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at"`
@@ -93,4 +94,34 @@ type Pembayaran struct {
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `json:"-" gorm:"index"`
+}
+
+// Potongan — master jenis potongan/keringanan SPP (Yatim, Anak Guru, Saudara Kandung, dll)
+// Nominal tetap untuk semua siswa yang dapet. Auto-applied ke jenis tagihan yang ApplyPotongan=true.
+type Potongan struct {
+	ID        uint           `json:"id" gorm:"primaryKey"`
+	SchoolID  uint           `json:"school_id" gorm:"index;not null"`
+	School    School         `json:"-" gorm:"foreignKey:SchoolID"`
+	Nama      string         `json:"nama" gorm:"not null"`     // "Yatim", "Anak Guru", "Saudara Kandung"
+	Kode      string         `json:"kode"`                     // "YTM", "ANG", "SDR"
+	Deskripsi string         `json:"deskripsi"`                // optional
+	Nominal   float64        `json:"nominal" gorm:"not null"`  // nominal Rp potongan per tagihan SPP
+	Aktif     bool           `json:"aktif" gorm:"default:true"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+}
+
+// StudentPotongan — junction many-to-many antara Student dan Potongan
+type StudentPotongan struct {
+	ID         uint           `json:"id" gorm:"primaryKey"`
+	SchoolID   uint           `json:"school_id" gorm:"index;not null"`
+	StudentID  uint           `json:"student_id" gorm:"index;not null;uniqueIndex:idx_student_potongan"`
+	Student    Student        `json:"student,omitempty" gorm:"foreignKey:StudentID"`
+	PotonganID uint           `json:"potongan_id" gorm:"index;not null;uniqueIndex:idx_student_potongan"`
+	Potongan   Potongan       `json:"potongan,omitempty" gorm:"foreignKey:PotonganID"`
+	Catatan    string         `json:"catatan"` // mis. "SK Yatim no. 123", "Anak guru pak Joko"
+	CreatedAt  time.Time      `json:"created_at"`
+	UpdatedAt  time.Time      `json:"updated_at"`
+	DeletedAt  gorm.DeletedAt `json:"-" gorm:"index"`
 }

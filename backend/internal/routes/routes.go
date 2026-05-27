@@ -326,6 +326,16 @@ func Setup(app *fiber.App) {
 	billing.Post("/pembayaran/:id/void", adminOnly, handlers.VoidPembayaran)
 	billing.Get("/pembayaran/:id/kuitansi", handlers.PrintKuitansi)
 
+	// Potongan (master + assign)
+	billing.Get("/potongan", handlers.GetPotongan)
+	billing.Post("/potongan", adminOnly, handlers.CreatePotongan)
+	billing.Put("/potongan/:id", adminOnly, handlers.UpdatePotongan)
+	billing.Delete("/potongan/:id", adminOnly, handlers.DeletePotongan)
+	billing.Get("/potongan/:id/students", handlers.GetPotonganStudents)
+	billing.Post("/potongan/:id/students", adminOnly, handlers.AssignPotonganStudents)
+	billing.Delete("/potongan/student/:id", adminOnly, handlers.UnassignPotonganStudent)
+	billing.Get("/siswa/:id/potongan", handlers.GetStudentPotongan)
+
 	// Dashboard
 	billing.Get("/dashboard", adminOnly, handlers.GetBillingDashboard)
 }

@@ -6,7 +6,7 @@ import {
   BookOpen, ClipboardCheck, GraduationCap, Calendar, Sparkles,
   LogOut, Menu, X, ChevronDown, CalendarClock, Trophy, Heart,
   Settings, ClipboardEdit, FileText, Key, School, Shield, MapPin,
-  Bell, Search, Plus, Wallet, Receipt, Stamp, MessageSquare,
+  Bell, Search, Plus, Wallet, Receipt, Stamp, MessageSquare, Tag,
 } from 'lucide-react'
 
 export const navItems = [
@@ -35,6 +35,7 @@ export const navItems = [
   // Keuangan
   { to: '/billing', icon: Wallet, label: 'Keuangan', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/billing/tagihan', icon: Receipt, label: 'Tagihan', roles: ['admin_pusat', 'admin_cabang'] },
+  { to: '/billing/potongan', icon: Tag, label: 'Potongan SPP', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/school-settings', icon: School, label: 'Pengaturan Sekolah', roles: ['admin_pusat'] },
   { to: '/document-assets', icon: Stamp, label: 'Kop & TTD', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/location-settings', icon: MapPin, label: 'Lokasi & GPS', roles: ['admin_pusat'] },

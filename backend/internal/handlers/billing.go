@@ -579,8 +579,20 @@ func GenerateTagihan(c *fiber.Ctx) error {
 		}
 
 		keringanan := float64(0)
+		keringananNote := req.KeringananNote
 		if v, ok := req.KeringananMap[strconv.Itoa(int(s.ID))]; ok {
 			keringanan = v
+		}
+		// Auto-apply potongan kalau jenis tagihan ApplyPotongan=true
+		// Manual keringanan (KeringananMap) override auto-potongan
+		if jt.ApplyPotongan && keringanan == 0 {
+			autoNominal, autoNote := CalcPotonganForStudent(sid, s.ID)
+			if autoNominal > 0 {
+				keringanan = autoNominal
+				if autoNote != "" {
+					keringananNote = "Potongan: " + autoNote
+				}
+			}
 		}
 
 		t := models.Tagihan{
@@ -590,7 +602,7 @@ func GenerateTagihan(c *fiber.Ctx) error {
 			Periode:        req.Periode,
 			Nominal:        nominal,
 			Keringanan:     keringanan,
-			KeringananNote: req.KeringananNote,
+			KeringananNote: keringananNote,
 			JatuhTempo:     jatuhTempo,
 			Status:         "belum_bayar",
 			Catatan:        req.Catatan,

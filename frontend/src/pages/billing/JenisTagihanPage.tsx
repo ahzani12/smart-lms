@@ -13,6 +13,7 @@ type Jenis = {
   deskripsi: string
   nominal_default: number
   periode: string
+  apply_potongan: boolean
   aktif: boolean
 }
 
@@ -49,6 +50,7 @@ export default function JenisTagihanPage() {
         deskripsi: edit.deskripsi || '',
         nominal_default: edit.nominal_default || 0,
         periode: edit.periode || 'bulanan',
+        apply_potongan: edit.apply_potongan ?? false,
         aktif: edit.aktif ?? true,
       }
       if (edit.id) {
@@ -240,6 +242,18 @@ export default function JenisTagihanPage() {
                   className="w-full px-4 py-3 rounded-xl border border-warm/60 bg-white focus:outline-none focus:border-amber-warm"
                 />
               </div>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={edit.apply_potongan ?? false}
+                  onChange={e => setEdit({ ...edit, apply_potongan: e.target.checked })}
+                  className="w-5 h-5 accent-amber-warm"
+                />
+                <div>
+                  <div className="font-bold text-navy">Auto-apply Potongan Siswa</div>
+                  <div className="text-xs text-navy/60">Centang untuk SPP. Saat generate, tagihan otomatis dikurangi nominal potongan siswa.</div>
+                </div>
+              </label>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"

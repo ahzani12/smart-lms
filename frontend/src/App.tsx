@@ -24,6 +24,7 @@ import NotificationSettings from './pages/NotificationSettings'
 import DocumentAssets from './pages/DocumentAssets'
 import BillingDashboard from './pages/billing/BillingDashboard'
 import JenisTagihanPage from './pages/billing/JenisTagihanPage'
+import PotonganPage from './pages/billing/PotonganPage'
 import GenerateTagihan from './pages/billing/GenerateTagihan'
 import TagihanList from './pages/billing/TagihanList'
 import TagihanSiswa from './pages/billing/TagihanSiswa'
@@ -136,6 +137,7 @@ export default function App() {
             {/* Keuangan / Billing */}
             <Route path="billing" element={<BillingDashboard />} />
             <Route path="billing/jenis" element={<JenisTagihanPage />} />
+            <Route path="billing/potongan" element={<PotonganPage />} />
             <Route path="billing/generate" element={<GenerateTagihan />} />
             <Route path="billing/tagihan" element={<TagihanList />} />
             <Route path="billing/siswa/:id" element={<TagihanSiswa />} />
