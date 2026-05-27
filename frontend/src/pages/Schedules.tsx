@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { Plus, Pencil, Trash2, Calendar, Clock, MapPin, Loader2, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, Calendar, Clock, MapPin, Loader2, X, PlusCircle } from 'lucide-react'
+import { SubjectForm } from './Subjects'
 
 interface Schedule {
   id: number
@@ -65,6 +66,11 @@ export default function Schedules() {
     axios.get('/api/teachers/').then(r => setTeachers(r.data || []))
     axios.get('/api/semesters/').then(r => setSemesters(r.data || []))
   }, [])
+
+  const reloadSubjects = async () => {
+    const r = await axios.get('/api/subjects/')
+    setSubjects(r.data || [])
+  }
 
   useEffect(() => { load() }, [filterClass, filterTeacher])
 
@@ -166,6 +172,7 @@ export default function Schedules() {
         <ScheduleForm
           initial={editing}
           classes={classes} subjects={subjects} teachers={teachers} semesters={semesters}
+          reloadSubjects={reloadSubjects}
           onClose={() => setShowForm(false)}
           onSaved={() => { setShowForm(false); load() }}
         />
@@ -174,9 +181,10 @@ export default function Schedules() {
   )
 }
 
-function ScheduleForm({ initial, classes, subjects, teachers, semesters, onClose, onSaved }: {
+function ScheduleForm({ initial, classes, subjects, teachers, semesters, reloadSubjects, onClose, onSaved }: {
   initial: Schedule | null
   classes: OptLite[]; subjects: OptLite[]; teachers: OptLite[]; semesters: OptLite[]
+  reloadSubjects: () => Promise<void>
   onClose: () => void; onSaved: () => void
 }) {
   const [form, setForm] = useState({
@@ -191,6 +199,7 @@ function ScheduleForm({ initial, classes, subjects, teachers, semesters, onClose
     kind: initial?.kind || 'mapel',
   })
   const [saving, setSaving] = useState(false)
+  const [showSubjectForm, setShowSubjectForm] = useState(false)
 
   const submit = async () => {
     if (!form.class_id || !form.subject_id || !form.teacher_id || !form.semester_id) {
@@ -252,11 +261,21 @@ function ScheduleForm({ initial, classes, subjects, teachers, semesters, onClose
           </div>
           <div>
             <label className="text-xs text-navy/70">Mata Pelajaran</label>
-            <select value={form.subject_id} onChange={e => setForm({ ...form, subject_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-warm/60 rounded-xl text-sm">
-              <option value="">Pilih...</option>
-              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <div className="flex gap-1">
+              <select value={form.subject_id} onChange={e => setForm({ ...form, subject_id: e.target.value })}
+                      className="flex-1 px-3 py-2 border border-warm/60 rounded-xl text-sm">
+                <option value="">Pilih...</option>
+                {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+              <button
+                type="button"
+                onClick={() => setShowSubjectForm(true)}
+                title="Tambah mapel baru"
+                className="px-2 rounded-xl bg-amber-soft/50 hover:bg-amber-soft text-amber-warm border border-warm/60 flex items-center justify-center"
+              >
+                <PlusCircle className="w-4 h-4" />
+              </button>
+            </div>
           </div>
           <div className="col-span-2">
             <label className="text-xs text-navy/70">Guru</label>
@@ -298,6 +317,18 @@ function ScheduleForm({ initial, classes, subjects, teachers, semesters, onClose
           </button>
         </div>
       </div>
+
+      {showSubjectForm && (
+        <SubjectForm
+          initial={null}
+          onClose={() => setShowSubjectForm(false)}
+          onSaved={async (created) => {
+            setShowSubjectForm(false)
+            await reloadSubjects()
+            if (created?.id) setForm(f => ({ ...f, subject_id: created.id }))
+          }}
+        />
+      )}
     </div>
   )
 }

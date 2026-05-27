@@ -15,6 +15,7 @@ import ExamMonitor from './pages/ExamMonitor'
 import QuestionBanks from './pages/QuestionBanks'
 import Attendance from './pages/Attendance'
 import Schedules from './pages/Schedules'
+import Subjects from './pages/Subjects'
 import Raport from './pages/Raport'
 import Calendar from './pages/Calendar'
 import AIHub from './pages/AIHub'
@@ -115,6 +116,7 @@ export default function App() {
             <Route path="question-banks" element={<QuestionBanks />} />
             <Route path="attendance" element={<Attendance />} />
             <Route path="schedules" element={<Schedules />} />
+            <Route path="subjects" element={<Subjects />} />
             <Route path="raport" element={<Raport />} />
             <Route path="calendar" element={<Calendar />} />
             <Route path="leaderboard" element={<Leaderboard />} />

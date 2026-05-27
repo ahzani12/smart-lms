@@ -18,6 +18,7 @@ export const navItems = [
   { to: '/exams', icon: FileQuestion, label: 'Ujian', roles: ['admin_pusat', 'admin_cabang', 'guru', 'siswa'] },
   { to: '/question-banks', icon: BookOpen, label: 'Bank Soal', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
   { to: '/schedules', icon: CalendarClock, label: 'Jadwal', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
+  { to: '/subjects', icon: BookOpen, label: 'Mata Pelajaran', roles: ['admin_pusat', 'admin_cabang'] },
   { to: '/attendance', icon: ClipboardCheck, label: 'Absensi', roles: ['admin_pusat', 'admin_cabang', 'guru', 'siswa'] },
   { to: '/input-scores', icon: ClipboardEdit, label: 'Input Nilai', roles: ['admin_pusat', 'admin_cabang', 'guru'] },
   { to: '/raport', icon: GraduationCap, label: 'Raport', roles: ['admin_pusat', 'admin_cabang', 'guru', 'siswa'] },
