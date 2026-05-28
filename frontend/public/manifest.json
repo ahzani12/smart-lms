@@ -1,11 +1,11 @@
 {
-  "name": "SSD - Sistem Digital Sekolah",
+  "name": "SSD - Smart System Digital",
   "short_name": "SSD",
-  "description": "Sistem Digital Sekolah - LMS, Raport, Absensi, Bank Soal",
+  "description": "SSD - Smart System Digital: LMS, Raport, Absensi, Bank Soal untuk sekolah modern",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4f46e5",
+  "theme_color": "#F59E0B",
   "orientation": "any",
   "icons": [
     {

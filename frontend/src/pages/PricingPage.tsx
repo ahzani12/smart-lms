@@ -56,7 +56,7 @@ const pricingFAQs = [
   },
   {
     q: 'Apakah ada biaya tersembunyi?',
-    a: 'Tidak ada. Notifikasi WA pakai akun lo sendiri (Fonnte/Wablas), jadi biaya kirim WA langsung ke provider. Smart-LMS hanya cas biaya tahunan.',
+    a: 'Tidak ada. Notifikasi WA pakai akun lo sendiri (Fonnte/Wablas), jadi biaya kirim WA langsung ke provider. SSD hanya cas biaya tahunan.',
   },
 ]
 
@@ -67,10 +67,13 @@ export default function PricingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <GraduationCap className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl gradient-warm flex items-center justify-center shadow-warm-sm">
+              <GraduationCap className="w-5 h-5 text-white" strokeWidth={2.4} />
             </div>
-            <span>Smart-LMS</span>
+            <div className="leading-tight">
+              <div className="font-extrabold">SSD</div>
+              <div className="text-[10px] text-amber-200 -mt-0.5">Smart System Digital</div>
+            </div>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm">
             <Link to="/" className="text-slate-300 hover:text-white transition">Beranda</Link>
@@ -245,7 +248,7 @@ export default function PricingPage() {
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
               </Link>
               <a
-                href="https://wa.me/628123456789?text=Halo,%20saya%20tertarik%20Smart-LMS"
+                href="https://wa.me/628123456789?text=Halo,%20saya%20tertarik%20SSD%20-%20Smart%20System%20Digital"
                 className="bg-emerald-600 hover:bg-emerald-500 px-6 py-4 rounded-xl font-bold text-center transition flex items-center justify-center gap-2"
               >
                 <Phone className="w-5 h-5" />
@@ -290,7 +293,7 @@ export default function PricingPage() {
 
       {/* FOOTER */}
       <footer className="border-t border-white/10 py-10 px-6 text-sm text-slate-500 text-center">
-        &copy; 2026 Smart-LMS. All rights reserved.
+        &copy; 2026 SSD &mdash; Smart System Digital. All rights reserved.
         <span className="mx-3">&middot;</span>
         <Link to="/" className="hover:text-white">Beranda</Link>
         <span className="mx-3">&middot;</span>
