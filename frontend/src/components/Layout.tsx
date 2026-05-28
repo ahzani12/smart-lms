@@ -110,7 +110,7 @@ export default function Layout() {
               </div>
               <div className="leading-tight">
                 <div className="font-extrabold text-lg text-white">SSD</div>
-                <div className="text-[10px] text-amber-200">Sistem Sekolah Digital</div>
+                <div className="text-[10px] text-amber-200">Smart System Digital</div>
               </div>
             </div>
           ) : (
@@ -203,7 +203,7 @@ export default function Layout() {
             </div>
             <div className="leading-tight">
               <div className="font-extrabold text-lg">SSD</div>
-              <div className="text-[10px] text-amber-200">Sistem Sekolah Digital</div>
+              <div className="text-[10px] text-amber-200">Smart System Digital</div>
             </div>
           </div>
           <button

@@ -43,7 +43,7 @@ export default function ParentLogin() {
           </div>
           <div>
             <div className="font-extrabold text-xl leading-tight">Portal Orang Tua</div>
-            <div className="text-xs text-amber-200">SSD · Sistem Sekolah Digital</div>
+            <div className="text-xs text-amber-200">SSD · Smart System Digital</div>
           </div>
         </div>
 
@@ -78,7 +78,7 @@ export default function ParentLogin() {
               <Heart className="w-9 h-9 text-white" strokeWidth={2.2} />
             </div>
             <h1 className="text-2xl font-extrabold text-navy">Portal Orang Tua</h1>
-            <p className="text-navy/60 text-sm">SSD · Sistem Sekolah Digital</p>
+            <p className="text-navy/60 text-sm">SSD · Smart System Digital</p>
           </div>
 
           <div className="mb-8">

@@ -68,7 +68,7 @@ const faqs = [
   },
   {
     q: 'Notifikasi WA pakai nomor kami atau bot?',
-    a: 'Anda pakai akun Fonnte / Wablas / Telegram Bot sendiri (BYOK). Smart-LMS cuma kirim event ke API Anda, jadi nomor tetap kontrol Anda.',
+    a: 'Anda pakai akun Fonnte / Wablas / Telegram Bot sendiri (BYOK). SSD cuma kirim event ke API Anda, jadi nomor tetap kontrol Anda.',
   },
   {
     q: 'Kalau langganan saya stop apa terjadi?',
@@ -108,10 +108,13 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <GraduationCap className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl gradient-warm flex items-center justify-center shadow-warm-sm">
+              <GraduationCap className="w-5 h-5 text-white" strokeWidth={2.4} />
             </div>
-            <span>Smart-LMS</span>
+            <div className="leading-tight">
+              <div className="font-extrabold">SSD</div>
+              <div className="text-[10px] text-amber-200 -mt-0.5">Smart System Digital</div>
+            </div>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm">
             <a href="#features" className="text-slate-300 hover:text-white transition">Fitur</a>
@@ -248,7 +251,7 @@ export default function LandingPage() {
               Semua yang sekolah Anda butuhkan
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-slate-400 max-w-2xl mx-auto text-lg">
-              Tidak perlu beli 5 software berbeda. Smart-LMS gabungkan absensi, akademik, keuangan, dan komunikasi.
+              Tidak perlu beli 5 software berbeda. SSD gabungkan absensi, akademik, keuangan, dan komunikasi.
             </motion.p>
           </motion.div>
 
@@ -482,10 +485,13 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 text-sm">
           <div>
             <div className="flex items-center gap-2 font-bold text-lg mb-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <GraduationCap className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-lg gradient-warm flex items-center justify-center">
+                <GraduationCap className="w-4 h-4 text-white" strokeWidth={2.4} />
               </div>
-              Smart-LMS
+              <div className="leading-tight">
+                <div>SSD</div>
+                <div className="text-[10px] text-amber-200 font-semibold -mt-0.5">Smart System Digital</div>
+              </div>
             </div>
             <p className="text-slate-400">Sistem manajemen sekolah modern untuk Indonesia.</p>
           </div>
@@ -513,7 +519,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-white/10 text-center text-slate-500 text-sm">
-          &copy; 2026 Smart-LMS. All rights reserved.
+          &copy; 2026 SSD &mdash; Smart System Digital. All rights reserved.
         </div>
       </footer>
     </div>
